@@ -19,10 +19,10 @@ from pygeofilter import ast, values
 from pygeofilter.backends.evaluator import Evaluator, handle
 from pygeofilter.parsers.cql2_json import parse as json_parse
 from pygeofilter.util import IdempotentDict
-from typing import Dict, Optional
+from typing import Any, Mapping, Optional
 import json
 import requests
-import shapely.geometry
+import shapely
 
 COMPARISON_OP_MAP = {
     ast.ComparisonOp.EQ: "eq",
@@ -47,7 +47,7 @@ def date_format(date):
 
 class CDSEEvaluator(Evaluator):
 
-    def __init__(self, attribute_map: Dict[str, str], function_map: Dict[str, str]):
+    def __init__(self, attribute_map: Mapping[str, str], function_map: Mapping[str, str]):
         self.attribute_map = attribute_map
         self.function_map = function_map
 
@@ -192,22 +192,22 @@ class CDSEEvaluator(Evaluator):
             return str(node)
 
 
-def to_cdse(cql2_filter) -> str:
+def to_cdse(cql2_filter: str | dict) -> str:
     return to_cdse_where(json_parse(cql2_filter), IdempotentDict())
 
 
 def to_cdse_where(
-    root: ast.Node,
-    field_mapping: Dict[str, str],
-    function_map: Optional[Dict[str, str]]=None,
+    root: ast.AstType,
+    field_mapping: Mapping[str, str],
+    function_map: Optional[Mapping[str, str]]=None,
 ) -> str:
     return CDSEEvaluator(field_mapping, function_map or {}).evaluate(root)
 
 
 def http_invoke(
     base_url: str,
-    cql2_filter: Dict
-) -> Dict:
+    cql2_filter: str | dict,
+) -> Mapping[str, Any]:
     current_filter = to_cdse(cql2_filter)
     url = f"{base_url}?$filter={current_filter}"
     response = requests.get(url)
