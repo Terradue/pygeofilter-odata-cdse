@@ -26,6 +26,8 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  "pystac",
+  "click>=8.2.1",
   "pygeofilter>=0.3.1",
   "ipykernel",
   "shapely",
@@ -38,6 +40,9 @@ dependencies = [
 Documentation = "https://github.com/Terradue/pygeofilter-odata-cdse#readme"
 Issues = "https://github.com/Terradue/pygeofilter-odata-cdse/issues"
 Source = "https://github.com/Terradue/pygeofilter-odata-cdse"
+
+[project.scripts]
+cdse-client = "pygeocdse.cli:main"
 
 [tool.hatch.version]
 path = "src/pygeocdse/__about__.py"
