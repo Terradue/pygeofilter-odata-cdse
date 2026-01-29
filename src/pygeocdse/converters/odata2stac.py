@@ -22,6 +22,15 @@ from pystac import (
     Item,
     ItemCollection
 )
+from pystac.extensions.product import ProductExtension
+from pystac.extensions.sar import (
+    Polarization,
+    SarExtension
+)
+from pystac.extensions.sat import (
+    OrbitState,
+    SatExtension
+)
 from typing import (
     Any,
     Dict,
@@ -67,9 +76,60 @@ def on_ending_datetime(
     _set_date("end_datetime", value, target_item)
 
 
+def on_orbit_number(
+    value: Any,
+    target_item: Item
+):
+    SatExtension.ensure_has_extension(target_item, add_if_missing=True)
+    target_item.ext.sat.absolute_orbit=value
+
+def on_relative_orbit_number(
+    value: Any,
+    target_item: Item
+):
+    SatExtension.ensure_has_extension(target_item, add_if_missing=True)
+    target_item.ext.sat.relative_orbit=value
+
+def on_orbit_direction(
+    value: Any,
+    target_item: Item
+):
+    SatExtension.ensure_has_extension(target_item, add_if_missing=True)
+    target_item.ext.sat.orbit_state=OrbitState[str(value).upper()]
+
+def on_polarisation_channels(
+    value: Any,
+    target_item: Item
+):
+    SarExtension.ensure_has_extension(target_item, add_if_missing=True)
+    target_item.ext.sar.polarizations = [Polarization[name] for name in str(value).split("&")]
+
+def on_product_type(
+    value: Any,
+    target_item: Item
+):
+    product_ext = ProductExtension.ext(target_item, add_if_missing=True)
+    product_ext.product_type = value
+
+def on_timeliness(
+    value: Any,
+    target_item: Item
+):
+    product_ext = ProductExtension.ext(target_item, add_if_missing=True)
+    product_ext.apply(
+        timeliness_category = value,
+        timeliness = "N/A"
+    )
+
 DISPATCH_REGISTRY: Dict[str, Handler] = {
     "beginningDateTime": on_beginning_datetime,
     "endingDateTime": on_ending_datetime,
+    "orbitNumber": on_orbit_number,
+    "relativeOrbitNumber": on_relative_orbit_number,
+    "orbitDirection": on_orbit_direction,
+    "polarisationChannels": on_polarisation_channels,
+    "productType": on_product_type,
+    "timeliness": on_timeliness
 }
 
 # Convert

@@ -27,7 +27,7 @@ classifiers = [
 ]
 dependencies = [
   "geojson",
-  "pystac",
+  "pystac @ git+ssh://git@github.com/Terradue/pystac.git@t2_extensions",
   "click>=8.2.1",
   "pygeofilter>=0.3.1",
   "ipykernel",
@@ -36,6 +36,9 @@ dependencies = [
   "loguru",
   "requests"
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [project.urls]
 Documentation = "https://github.com/Terradue/pygeofilter-odata-cdse#readme"
