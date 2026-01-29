@@ -22,6 +22,7 @@ from pystac import (
     Item,
     ItemCollection
 )
+from pystac.extensions.processing import ProcessingExtension
 from pystac.extensions.product import ProductExtension
 from pystac.extensions.sar import (
     Polarization,
@@ -121,6 +122,41 @@ def on_timeliness(
         timeliness = "N/A"
     )
 
+def on_processing_center(
+    value: Any,
+    target_item: Item
+):
+    proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
+    proc_ext.facility = value
+
+def on_processing_level(
+    value: Any,
+    target_item: Item
+):
+    proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
+    proc_ext.level = value
+
+def on_processing_date(
+    value: Any,
+    target_item: Item
+):
+    proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
+    proc_ext.processing_datetime = _parse_rfc3339(str(value))
+
+def on_processor_name(
+    value: Any,
+    target_item: Item
+):
+    proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
+    proc_ext.software = value
+
+def on_processor_version(
+    value: Any,
+    target_item: Item
+):
+    proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
+    proc_ext.version = value
+
 DISPATCH_REGISTRY: Dict[str, Handler] = {
     "beginningDateTime": on_beginning_datetime,
     "endingDateTime": on_ending_datetime,
@@ -129,7 +165,12 @@ DISPATCH_REGISTRY: Dict[str, Handler] = {
     "orbitDirection": on_orbit_direction,
     "polarisationChannels": on_polarisation_channels,
     "productType": on_product_type,
-    "timeliness": on_timeliness
+    "timeliness": on_timeliness,
+    "processingCenter": on_processing_center,
+    "processingLevel": on_processing_level,
+    "processingDate": on_processing_date,
+    "processorName": on_processor_name,
+    "processorVersion": on_processor_version
 }
 
 # Convert
