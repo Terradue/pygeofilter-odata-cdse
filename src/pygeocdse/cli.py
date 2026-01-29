@@ -18,9 +18,13 @@ from enum import (
     auto,
     Enum
 )
-from pygeocdse.evaluator import http_invoke
+from loguru import logger
+from pathlib import Path
+from pygeocdse.evaluator import to_cdse
+from pygeocdse.converters.odata2stac import to_stac_item_collection
 from typing import (
     Any,
+    Dict,
     List,
     Mapping,
     Optional,
@@ -28,6 +32,8 @@ from typing import (
 )
 import click
 import json
+import requests
+import sys
 
 @click.group(
     context_settings={
@@ -163,6 +169,14 @@ def _parse_bbox(
     required=False,
     default=HttpMethod.POST
 )
+@click.option(
+    "--save",
+    type=click.Path(
+        path_type=Path
+    ),
+    required=False,
+    help="Filename to save GeoJSON FeatureCollection to"
+)
 def search_cmd(
     url: str,
     collections: Tuple[str],
@@ -177,13 +191,36 @@ def search_cmd(
     fields: Tuple[str],
     limit: int,
     max_items: int,
-    method: HttpMethod
+    method: HttpMethod,
+    save: Path | None
 ):
-    if FilterLang.CQL2_JSON.value == filter_lang:
-        cql2_filter = json.loads(filter)
-    else:
-        cql2_filter = filter
-    
-    result: Mapping[str, Any] = http_invoke(url, cql2_filter)
+    try:
+        if FilterLang.CQL2_JSON.value == filter_lang:
+            cql2_filter = json.loads(filter)
+        else:
+            cql2_filter = filter
+        
+        transpiled_filter = to_cdse(cql2_filter)
+        filter_url = f"{url}?$filter={transpiled_filter}&$expand=Assets&$expand=Attributes&$expand=Locations"
 
-    print(result)
+        logger.debug(f"Invoking {filter_url}...")
+
+        response = requests.get(filter_url)
+        response.raise_for_status()
+        result: Mapping[str, Any] = response.json()
+
+        if save:
+            save.parent.mkdir(parents=True, exist_ok=True)
+            with save.open("w") as output_stream:
+                to_stac_item_collection(result, output_stream)
+            logger.success(f"'{filter_url}' results successfully converted to STAC Item Collection to {save.absolute()}.")
+        else:
+            to_stac_item_collection(result, sys.stdout)
+            logger.success(f"'{filter_url}' results successfully converted to STAC Item Collection.")
+
+        logger.info('------------------------------------------------------------------------')
+        logger.success('BUILD SUCCESS')
+    except Exception as e:
+        logger.info('------------------------------------------------------------------------')
+        logger.error('BUILD FAILED')
+        logger.error(f"An unexpected error occurred: {e}")

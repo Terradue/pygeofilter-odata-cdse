@@ -210,6 +210,7 @@ def http_invoke(
 ) -> Mapping[str, Any]:
     current_filter = to_cdse(cql2_filter)
     url = f"{base_url}?$filter={current_filter}"
+    print(url)
     response = requests.get(url)
     response.raise_for_status()  # Raise an error for HTTP error codes
     data = response.json()
