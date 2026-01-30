@@ -20,7 +20,7 @@ FROM rockylinux/rockylinux:10.1-minimal AS runtime
 
 
 RUN microdnf -y update && \
-    microdnf -y install python3 python3-pip git && \
+    microdnf -y install shadow-utils python3 python3-pip git && \
     microdnf clean all
 
 # Non-root user
