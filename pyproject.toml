@@ -27,7 +27,7 @@ classifiers = [
 ]
 dependencies = [
   "geojson",
-  "pystac @ git+ssh://git@github.com/Terradue/pystac.git@t2_extensions",
+  "pystac @ git+https://github.com/Terradue/pystac.git@t2_extensions",
   "click>=8.2.1",
   "pygeofilter>=0.3.1",
   "ipykernel",
@@ -46,7 +46,7 @@ Issues = "https://github.com/Terradue/pygeofilter-odata-cdse/issues"
 Source = "https://github.com/Terradue/pygeofilter-odata-cdse"
 
 [project.scripts]
-cdse-client = "pygeocdse.cli:main"
+odata-client = "pygeocdse.cli:main"
 
 [tool.hatch.version]
 path = "src/pygeocdse/__about__.py"
