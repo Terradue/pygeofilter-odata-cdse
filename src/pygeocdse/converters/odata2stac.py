@@ -20,7 +20,9 @@ from loguru import logger
 from pystac import (
     Asset,
     Item,
-    ItemCollection
+    ItemCollection,
+    Link,
+    RelType
 )
 from pystac.extensions.processing import ProcessingExtension
 from pystac.extensions.product import ProductExtension
@@ -205,6 +207,7 @@ def _bbox_from_geojson_geometry(geom: Dict[str, Any]) -> List[float]:
 
 
 def odata_products_to_stac_item_collection(
+    url: str,
     odata: Mapping[str, Any]
 ) -> ItemCollection:
     """
@@ -241,6 +244,15 @@ def odata_products_to_stac_item_collection(
             bbox=bbox,
             datetime=dt,
             properties=properties
+        )
+
+        item.add_link(
+            Link(
+                rel=RelType.DERIVED_FROM,
+                target=f"{url}?$filter=Name%20eq%20%27{product.get('Name')}%27&$expand=Assets&$expand=Attributes#OData.CSC.StringAttribute",
+                media_type="application/json",
+                title="OData product entry"
+            )
         )
 
         locations = product.get("Locations") or []
@@ -307,10 +319,11 @@ def odata_products_to_stac_item_collection(
 
 
 def to_stac_item_collection(
+    url: str,
     odata: Mapping[str, Any],
     output_stream: TextIO
 ):
-    item_collection: ItemCollection = odata_products_to_stac_item_collection(odata)
+    item_collection: ItemCollection = odata_products_to_stac_item_collection(url, odata)
     json.dump(
         item_collection.to_dict(),
         output_stream,

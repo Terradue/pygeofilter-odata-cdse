@@ -46,7 +46,7 @@ Issues = "https://github.com/Terradue/pygeofilter-odata-cdse/issues"
 Source = "https://github.com/Terradue/pygeofilter-odata-cdse"
 
 [project.scripts]
-cdse-client = "pygeocdse.cli:main"
+odata-client = "pygeocdse.cli:main"
 
 [tool.hatch.version]
 path = "src/pygeocdse/__about__.py"

@@ -200,6 +200,9 @@ def search_cmd(
         else:
             cql2_filter = filter
         
+        # TODO
+        # cql2_filter
+
         transpiled_filter = to_cdse(cql2_filter)
         filter_url = f"{url}?$filter={transpiled_filter}&$expand=Assets&$expand=Attributes&$expand=Locations"
 
@@ -212,10 +215,10 @@ def search_cmd(
         if save:
             save.parent.mkdir(parents=True, exist_ok=True)
             with save.open("w") as output_stream:
-                to_stac_item_collection(result, output_stream)
+                to_stac_item_collection(url, result, output_stream)
             logger.success(f"'{filter_url}' results successfully converted to STAC Item Collection to {save.absolute()}.")
         else:
-            to_stac_item_collection(result, sys.stdout)
+            to_stac_item_collection(url, result, sys.stdout)
             logger.success(f"'{filter_url}' results successfully converted to STAC Item Collection.")
 
         logger.info('------------------------------------------------------------------------')
