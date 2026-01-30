@@ -36,6 +36,7 @@ jobs:
   # Resolve release tag from ref
   # ------------------------------------------------------------
   release-meta:
+    needs: test
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
@@ -150,7 +151,8 @@ jobs:
 
           TAG=${{ needs.release-meta.outputs.tag }}
           REGISTRY=ghcr.io
-          IMAGE_PREFIX=${{ github.repository_owner }}
+          IMAGE_PREFIX="${{ github.repository_owner }}"
+          IMAGE_PREFIX="${IMAGE_PREFIX,,}"
           IMAGE=${{ github.repository }}
 
           IMAGE_REF="${REGISTRY}/${IMAGE_PREFIX}/${IMAGE}:${TAG}"
