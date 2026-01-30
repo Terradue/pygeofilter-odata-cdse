@@ -154,8 +154,9 @@ jobs:
           IMAGE_PREFIX="${{ github.repository_owner }}"
           IMAGE_PREFIX="${IMAGE_PREFIX,,}"
           IMAGE=${{ github.repository }}
+          IMAGE="${IMAGE,,}"
 
-          IMAGE_REF="${REGISTRY}/${IMAGE_PREFIX}/${IMAGE}:${TAG}"
+          IMAGE_REF="${REGISTRY}/${IMAGE}:${TAG}"
 
           skopeo copy \
             --dest-creds="${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
@@ -167,4 +168,4 @@ jobs:
             docker://${IMAGE_REF} \
             | jq -r .Digest)
 
-          echo "${REGISTRY}/${IMAGE_PREFIX}/${IMAGE}@${DIGEST}" > image.digest
+          echo "${IMAGE_REF}@${DIGEST}" > image.digest
