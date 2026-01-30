@@ -36,11 +36,11 @@ WORKDIR /app
 # Create a venv and install only wheel
 ENV VIRTUAL_ENV=/app/venv
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
-RUN python3 -m venv /app/venv && \
-    pip install --no-cache-dir --upgrade pip
+RUN /usr/bin/python3 -m venv /app/venv && \
+    /app/venv/bin/pip install --no-cache-dir --upgrade pip
 
 COPY --from=builder /src/dist/*.whl /app/dist/
 
-RUN pip install --no-cache-dir /app/dist/*.whl && \
+RUN /app/venv/bin/pip install --no-cache-dir /app/dist/*.whl && \
     odata-client --help
 
