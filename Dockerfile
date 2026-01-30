@@ -35,7 +35,7 @@ WORKDIR /app
 
 # Create a venv and install only wheel
 ENV VIRTUAL_ENV=/app/venv
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}:/usr/bin"
 RUN python3 -m venv /app/venv && \
     /app/venv/bin/pip install --no-cache-dir --upgrade pip
 
