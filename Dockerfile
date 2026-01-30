@@ -20,13 +20,13 @@ FROM rockylinux/rockylinux:10.1-minimal AS runtime
 
 
 RUN microdnf -y update && \
-    microdnf -y install shadow-utils python3 python3-pip git && \
+    microdnf -y install python3 python3-pip git && \
     microdnf clean all
 
 # Non-root user
 ENV HOME=/home/neo
-RUN groupadd -g 2000 neo && \
-    useradd -u 2000 -g 2000 -m -d ${HOME} -s /sbin/nologin neo && \
+RUN /usr/sbin/groupadd -g 2000 neo && \
+    /usr/sbin/useradd -u 2000 -g 2000 -m -d ${HOME} -s /sbin/nologin neo && \
     mkdir -p /app && \
     chown -R 2000:2000 /app ${HOME}
 
