@@ -14,50 +14,52 @@
 
 from __future__ import annotations
 
-
+from datetime import (
+    datetime,
+    timezone
+)
 from pygeofilter.ast import (
     And,
-    AstType
+    AstType,
+    Attribute,
+    Equal,
+    GeometryIntersects,
+    Or,
+    TimeAfter,
+    TimeBefore
 )
 from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
+from pygeofilter.util import parse_datetime
+from pygeofilter.values import (
+    Geometry
+)
+from shapely.geometry import (
+    box,
+    mapping
+)
 from typing import (
-    Any,
-    Mapping
+    Sequence,
+    Tuple
 )
 
-
-def and_concat(
+def _and_concat(
     left: AstType,
-    right: Mapping[str, Any]
-) -> And:
+    right: AstType
+) -> AstType:
     """
-    Parse `right` (CQL2-JSON dict) into an AST, then flatten nested ANDs from `left`
-    and that parsed right AST, and rebuild as a left-associated AND chain.
+    Flatten nested ANDs from `left` and `right`, then rebuild as a left-associated AND chain.
 
-    Returns an `ast.And` (top-level).
+    Assumes `left` and `right` are non-None and already validated as AstType.
     """
-
-    if not isinstance(left, AstType):
-        raise TypeError(f"Expected `left` to be ast.AstType, got {type(left)!r}")
-
-    if not isinstance(right, Mapping):
-        raise TypeError(f"Expected `right` to be a Mapping[str, Any], got {type(right)!r}")
-
-    right_ast: AstType = parse_cql2_json(dict(right))
-
     parts: list[AstType] = []
 
     def collect(node: AstType) -> None:
-        if not isinstance(node, AstType):
-            raise TypeError(f"Expected ast.AstType, got {type(node)!r}: {node!r}")
-
         if isinstance(node, And):
+            # Guard against unexpected malformed nodes
             lhs = getattr(node, "lhs", None)
             rhs = getattr(node, "rhs", None)
             if lhs is None or rhs is None:
-                raise ValueError(f"Malformed ast.And node (missing lhs/rhs): {node!r}")
-            if not isinstance(lhs, AstType) or not isinstance(rhs, AstType):
-                raise ValueError(f"Malformed ast.And node (lhs/rhs not AstType): {node!r}")
+                raise ValueError(f"Malformed And node (missing lhs/rhs): {node!r}")
 
             collect(lhs)
             collect(rhs)
@@ -65,18 +67,112 @@ def and_concat(
             parts.append(node)
 
     collect(left)
-    collect(right_ast)
+    collect(right)
 
-    if len(parts) < 2:
-        # With non-empty left and right this should never happen unless the AST is malformed
-        raise ValueError("and_concat: expected at least two clauses after collection")
+    # At least two parts exist unless one side was a degenerate And,
+    # but keep this safe anyway.
+    if not parts:
+        raise ValueError("and_concat: no clauses collected (unexpected empty AND tree)")
 
-    expr: AstType = parts[0]
+    expr = parts[0]
     for p in parts[1:]:
         expr = And(expr, p)
 
-    if not isinstance(expr, And):
-        # Defensive: should be impossible with len(parts) >= 2
-        raise ValueError("and_concat: expected top-level ast.And after rebuild")
-
     return expr
+
+def collections_filter(
+    filter: AstType,
+    collections: Sequence[str]
+) -> AstType:
+    """
+    Build a pygeofilter AST equivalent to:
+
+      (property_name = c1) OR (property_name = c2) OR ...
+
+    If `collections` has a single item, returns the single "=" expression (not an Or).
+    """
+    cols = [c.strip() for c in collections if c and c.strip()]
+    if not cols:
+        raise ValueError("collections_or_ast: `collections` is empty (or only blanks)")
+
+    # property reference and "=" nodes
+    prop = Attribute("Collection/Name")
+    terms: list[AstType] = [Equal(prop, c) for c in cols]
+
+    if len(terms) == 1:
+        return _and_concat(filter, terms[0])
+
+    # left-associative OR chain: Or(Or(t1, t2), t3)...
+    expr: AstType = Or(terms[0], terms[1])
+    for t in terms[2:]:
+        expr = Or(expr, t)
+
+    return _and_concat(filter, expr)
+
+def bbox_filter(
+    filter: AstType,
+    bbox: Tuple[float]
+) -> AstType:
+    geometry = box(*bbox)
+
+    geometry_filter = GeometryIntersects(
+        Attribute("geometry"),
+        Geometry(mapping(geometry))
+    )
+
+    return _and_concat(filter, geometry_filter)
+
+
+def _as_utc(
+    datetime: str
+) -> datetime:
+    dt: datetime = parse_datetime(datetime)
+    # pygeofilter.util.parse_datetime may return naive or tz-aware dt depending on input
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def datetime_or_interval_filter(
+    filter: AstType,
+    datetime: str
+) -> AstType:
+    datetime = datetime.strip()
+    if not datetime:
+        raise ValueError("Empty datetime/interval string")
+
+    if "/" in datetime:
+        start_raw, end_raw = (p.strip() for p in datetime.split("/", 1))
+        if not start_raw or not end_raw:
+            raise ValueError("Both start and end must be provided in 'start/end'")
+
+        datetime_filter = {
+            "op": "and",
+            "args": [
+                {
+                    "op": "t_begins",
+                    "args": [
+                        {"property": "ContentDate/Start"},
+                        {"timestamp": start_raw}
+                    ]
+                },
+                {
+                    "op": "t_ends",
+                    "args": [
+                        {"property": "ContentDate/End"},
+                        {"timestamp": end_raw}
+                    ]
+                }
+            ]
+        }
+    else:
+        # single instant/date
+        datetime_filter = {
+            "op": "t_begins",
+            "args": [
+                {"property": "ContentDate/Start"},
+                {"timestamp": datetime}
+            ]
+        }
+
+    return _and_concat(filter, parse_cql2_json(datetime_filter))

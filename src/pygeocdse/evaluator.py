@@ -13,12 +13,19 @@
 # limitations under the License.
 
 from builtins import isinstance
-from datetime import date, datetime, timedelta
+from datetime import (
+    date,
+    datetime,
+    timedelta
+)
 from pygeocdse.odata_attributes import ALL_ATTRIBUTES, get_attribute_type
 from pygeofilter import ast, values
 from pygeofilter.backends.evaluator import Evaluator, handle
 from pygeofilter.parsers.cql2_json import parse as json_parse
-from pygeofilter.util import IdempotentDict
+from pygeofilter.util import (
+    IdempotentDict,
+    parse_datetime
+)
 from typing import Any, Mapping, Optional
 import json
 import requests
@@ -41,8 +48,11 @@ ARITHMETIC_OP_MAP = {
 }
 
 
-def date_format(date):
-    return date.strftime("%Y-%m-%dT%H:%M:%S%Z")
+def date_format(date: str | datetime):
+    if isinstance(date, str):
+        return date_format(parse_datetime(date))
+
+    return date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 class CDSEEvaluator(Evaluator):
@@ -55,9 +65,13 @@ class CDSEEvaluator(Evaluator):
     def not_(self, node, sub):
         return f"NOT {sub}"
 
-    @handle(ast.And, ast.Or)
-    def combination(self, node, lhs, rhs):
+    @handle(ast.And)
+    def and_combination(self, node, lhs, rhs):
         return f"{lhs} {node.op.value.lower()} {rhs}"
+
+    @handle(ast.Or)
+    def or_combination(self, node, lhs, rhs):
+        return f"({lhs} {node.op.value.lower()} {rhs})"
 
     @handle(ast.Comparison, subclasses=True)
     def comparison(self, node, lhs, rhs):
@@ -118,12 +132,18 @@ class CDSEEvaluator(Evaluator):
         if isinstance(rhs, values.Interval):
             return f"{node.lhs.name} gt {date_format(rhs.start)} and {node.lhs.name} le {date_format(rhs.end)}"
 
-        return f"{node.lhs.name} gt {rhs}"
+        if isinstance(rhs, str):
+            return f"{node.lhs.name} gt {date_format(rhs)}"
+
+        return f"{node.lhs.name} lt {rhs}"
 
     @handle(ast.TimeBefore)
     def timeBefore(self, node, lhs, rhs):
         if isinstance(rhs, values.Interval):
             return f"{node.lhs.name} ge {date_format(rhs.start)} and {node.lhs.name} lt {date_format(rhs.end)}"
+
+        if isinstance(rhs, str):
+            return f"{node.lhs.name} lt {date_format(rhs)}"
 
         return f"{node.lhs.name} lt {rhs}"
 
@@ -132,12 +152,18 @@ class CDSEEvaluator(Evaluator):
         if isinstance(rhs, values.Interval):
             return f"{node.lhs.name} ge {date_format(rhs.start)} and {node.lhs.name} le {date_format(rhs.end)}"
 
+        if isinstance(rhs, str):
+            return f"{node.lhs.name} ge {date_format(rhs)}"
+
         return f"{node.lhs.name} ge {rhs}"
 
     @handle(ast.TimeEnds)
     def timeEnds(self, node, lhs, rhs):
         if isinstance(rhs, values.Interval):
             return f"{node.lhs.name} ge {date_format(rhs.start)} and {node.lhs.name} le {date_format(rhs.end)}"
+
+        if isinstance(rhs, str):
+            return f"{node.lhs.name} le {date_format(rhs)}"
 
         return f"{node.lhs.name} le {rhs}"
 

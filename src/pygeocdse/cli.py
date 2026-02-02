@@ -21,17 +21,23 @@ from enum import (
 from loguru import logger
 from pathlib import Path
 from pygeocdse.evaluator import to_cdse
+from pygeocdse.ast_utils import (
+    bbox_filter,
+    collections_filter,
+    datetime_or_interval_filter
+)
 from pygeocdse.converters.odata2stac import to_stac_item_collection
+from pygeofilter import ast
+from pygeofilter.backends.cql2_json import to_cql2
+from pygeofilter.parsers.ecql import parse as parse_ecql
+from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
 from typing import (
     Any,
-    Dict,
     List,
     Mapping,
-    Optional,
     Tuple
 )
 import click
-import json
 import requests
 import sys
 
@@ -59,19 +65,6 @@ class FilterLang(Enum):
     CQL2_TEXT = "cql2-text"
 
 
-def _parse_bbox(
-    _: click.Context,
-    __: click.Parameter,
-    value: Optional[Tuple[float, ...]]
-) -> List[float] | None:
-    # Typical STAC bbox: 4 floats
-    if value is None:
-        return None
-    if len(value) !=4:
-        raise click.BadParameter("BBox must be 4 numbers (minx miny maxx maxy).")
-    return list(value)
-
-
 @main.command("search")
 @click.argument(
     "url",
@@ -93,10 +86,8 @@ def _parse_bbox(
 )
 @click.option(
     "--bbox",
-    type=click.FLOAT,
-    multiple=True,
+    type=(click.FLOAT, click.FLOAT, click.FLOAT, click.FLOAT),
     required=False,
-    # callback=_parse_bbox,
     help="Bounding box (min lon, min lat, max lon, max lat)."
 )
 @click.option(
@@ -151,13 +142,15 @@ def _parse_bbox(
     "--limit",
     help="Page size limit",
     required=False,
-    type=click.INT
+    type=click.INT,
+    default = 20
 )
 @click.option(
     "--max-items",
     help="Max items to retrieve from search",
     required=False,
     type=click.INT,
+    default = 200
 )
 @click.option(
     "--method",
@@ -179,16 +172,16 @@ def _parse_bbox(
 )
 def search_cmd(
     url: str,
-    collections: Tuple[str],
-    ids: Tuple[str],
-    bbox: str,
+    collections: List[str] | None,
+    ids: List[str],
+    bbox: Tuple[float, ...] | None,
     intersects: str,
     datetime: str,
     query: str,
     filter: str,
     filter_lang: str,
-    sortby: Tuple[str],
-    fields: Tuple[str],
+    sortby: List[str],
+    fields: List[str],
     limit: int,
     max_items: int,
     method: HttpMethod,
@@ -196,19 +189,29 @@ def search_cmd(
 ):
     try:
         if FilterLang.CQL2_JSON.value == filter_lang:
-            cql2_filter = json.loads(filter)
+            ast = parse_cql2_json(filter)
         else:
-            cql2_filter = filter
+            ast = parse_ecql(filter)
         
-        # TODO
-        # cql2_filter
+        if collections:
+            ast = collections_filter(ast, collections)
+        if bbox:
+            ast = bbox_filter(ast, bbox)
+        if datetime:
+            ast = datetime_or_interval_filter(ast, datetime)
 
-        transpiled_filter = to_cdse(cql2_filter)
-        filter_url = f"{url}?$filter={transpiled_filter}&$expand=Assets&$expand=Attributes&$expand=Locations"
+        cql2_json_str = to_cql2(ast)
+        transpiled_filter = to_cdse(cql2_json_str)
+        filter_url = f"{url}?$filter={transpiled_filter}&$top={limit}&$expand=Assets&$expand=Attributes&$expand=Locations"
 
         logger.debug(f"Invoking {filter_url}...")
 
-        response = requests.get(filter_url)
+        response = requests.get(
+            url=filter_url,
+            headers={
+                "Prefer": f"odata.maxpagesize={max_items}"
+            }
+        )
         response.raise_for_status()
         result: Mapping[str, Any] = response.json()
 
