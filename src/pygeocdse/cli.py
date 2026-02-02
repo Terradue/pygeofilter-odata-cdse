@@ -27,7 +27,7 @@ from pygeocdse.ast_utils import (
     datetime_or_interval_filter
 )
 from pygeocdse.converters.odata2stac import to_stac_item_collection
-from pygeofilter import ast
+from pygeofilter.ast import AstType
 from pygeofilter.backends.cql2_json import to_cql2
 from pygeofilter.parsers.ecql import parse as parse_ecql
 from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
@@ -173,26 +173,29 @@ class FilterLang(Enum):
 def search_cmd(
     url: str,
     collections: List[str] | None,
-    ids: List[str],
+    ids: List[str] | None,
     bbox: Tuple[float, ...] | None,
-    intersects: str,
-    datetime: str,
-    query: str,
-    filter: str,
-    filter_lang: str,
-    sortby: List[str],
-    fields: List[str],
-    limit: int,
-    max_items: int,
-    method: HttpMethod,
+    intersects: str | None,
+    datetime: str | None,
+    query: str | None,
+    filter: str | None,
+    filter_lang: str | None,
+    sortby: List[str] | None,
+    fields: List[str] | None,
+    limit: int | None,
+    max_items: int | None,
+    method: HttpMethod | None,
     save: Path | None
 ):
     try:
-        if FilterLang.CQL2_JSON.value == filter_lang:
-            ast = parse_cql2_json(filter)
-        else:
-            ast = parse_ecql(filter)
-        
+        ast: AstType | None = None
+
+        if filter:
+            if FilterLang.CQL2_JSON.value == filter_lang:
+                ast = parse_cql2_json(filter)
+            else:
+                ast = parse_ecql(filter) # type: ignore            
+
         if collections:
             ast = collections_filter(ast, collections)
         if bbox:
@@ -200,16 +203,19 @@ def search_cmd(
         if datetime:
             ast = datetime_or_interval_filter(ast, datetime)
 
+        if ast is None:
+            raise Exception("At least one of the --filter|--collections|--bbox|--datetime option must be set.")
+
         cql2_json_str = to_cql2(ast)
         transpiled_filter = to_cdse(cql2_json_str)
-        filter_url = f"{url}?$filter={transpiled_filter}&$top={limit}&$expand=Assets&$expand=Attributes&$expand=Locations"
+        filter_url = f"{url}?$filter={transpiled_filter}&$top={max_items}&$expand=Assets&$expand=Attributes&$expand=Locations"
 
         logger.debug(f"Invoking {filter_url}...")
 
         response = requests.get(
             url=filter_url,
             headers={
-                "Prefer": f"odata.maxpagesize={max_items}"
+                "Prefer": f"odata.maxpagesize={limit}"
             }
         )
         response.raise_for_status()

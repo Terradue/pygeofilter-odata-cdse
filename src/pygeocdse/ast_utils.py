@@ -43,7 +43,7 @@ from typing import (
 )
 
 def _and_concat(
-    left: AstType,
+    left: AstType | None,
     right: AstType
 ) -> AstType:
     """
@@ -51,6 +51,9 @@ def _and_concat(
 
     Assumes `left` and `right` are non-None and already validated as AstType.
     """
+    if not left:
+        return right
+
     parts: list[AstType] = []
 
     def collect(node: AstType) -> None:
@@ -81,7 +84,7 @@ def _and_concat(
     return expr
 
 def collections_filter(
-    filter: AstType,
+    filter: AstType | None,
     collections: Sequence[str]
 ) -> AstType:
     """
@@ -110,7 +113,7 @@ def collections_filter(
     return _and_concat(filter, expr)
 
 def bbox_filter(
-    filter: AstType,
+    filter: AstType | None,
     bbox: Tuple[float]
 ) -> AstType:
     geometry = box(*bbox)
@@ -134,7 +137,7 @@ def _as_utc(
 
 
 def datetime_or_interval_filter(
-    filter: AstType,
+    filter: AstType | None,
     datetime: str
 ) -> AstType:
     datetime = datetime.strip()
