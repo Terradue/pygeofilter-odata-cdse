@@ -19,7 +19,9 @@ on:
   #   types: [created]
   release:
     types: [published]
-
+  push:
+    tags:
+      - 'v*'
     
 permissions:
   id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
