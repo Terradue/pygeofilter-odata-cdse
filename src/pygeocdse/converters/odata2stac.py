@@ -14,37 +14,28 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import datetime
 from loguru import logger
-from pystac import (
-    Asset,
-    Item,
-    ItemCollection,
-    Link,
-    RelType
-)
+from pystac import Asset, Item, ItemCollection, Link, RelType
 from pystac.extensions.processing import ProcessingExtension
 from pystac.extensions.product import ProductExtension
-from pystac.extensions.sar import (
-    Polarization,
-    SarExtension
-)
-from pystac.extensions.sat import (
-    OrbitState,
-    SatExtension
-)
+from pystac.extensions.sar import Polarization, SarExtension
+from pystac.extensions.sat import OrbitState, SatExtension
 from pystac.extensions.eo import EOExtension
-from typing import (
-    Any,
-    Dict,
-    List,
-    Mapping,
-    Protocol,
-    TextIO
-)
+from typing import Any, Dict, List, Mapping, Protocol, TextIO
 
 import json
+
+LEVEL_MAP = {
+    "LEVEL1": "L1",
+    "LEVEL2": "L2",
+    "LEVEL3": "L3",
+    "S2MSI1C": "L1",
+    "S2MSI2A": "L2",
+    "1": "L1",
+    "2": "L2",
+}
+
 
 def _parse_rfc3339(dt: str) -> datetime:
     """Parse timestamps like '2025-01-28T15:50:03.000000Z' into aware datetime."""
@@ -52,182 +43,122 @@ def _parse_rfc3339(dt: str) -> datetime:
         dt = dt[:-1] + "+00:00"
     return datetime.fromisoformat(dt)
 
+
 # Handlers
 
+
 class Handler(Protocol):
-    def __call__(self, product: Mapping[str, Any], value: Any, target_item: Item) -> None: ...
+    def __call__(
+        self, product: Mapping[str, Any], value: Any, target_item: Item
+    ) -> None: ...
 
 
-def _set_date(
-    target_property: str,
-    value: Any,
-    target_item: Item
-):
+def _set_date(target_property: str, value: Any, target_item: Item):
     target_item.properties[target_property] = _parse_rfc3339(str(value)).isoformat()
 
 
-def on_beginning_datetime(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+def on_beginning_datetime(product: Mapping[str, Any], value: Any, target_item: Item):
     _set_date("start_datetime", value, target_item)
 
 
-def on_ending_datetime(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+def on_ending_datetime(product: Mapping[str, Any], value: Any, target_item: Item):
     _set_date("end_datetime", value, target_item)
 
 
-def on_orbit_number(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+def on_orbit_number(product: Mapping[str, Any], value: Any, target_item: Item):
     SatExtension.ensure_has_extension(target_item, add_if_missing=True)
-    target_item.ext.sat.absolute_orbit=value
+    target_item.ext.sat.absolute_orbit = value
 
-def on_relative_orbit_number(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_relative_orbit_number(product: Mapping[str, Any], value: Any, target_item: Item):
     SatExtension.ensure_has_extension(target_item, add_if_missing=True)
-    target_item.ext.sat.relative_orbit=value
+    target_item.ext.sat.relative_orbit = value
 
-def on_orbit_direction(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_orbit_direction(product: Mapping[str, Any], value: Any, target_item: Item):
     SatExtension.ensure_has_extension(target_item, add_if_missing=True)
-    target_item.ext.sat.orbit_state=OrbitState[str(value).upper()]
+    target_item.ext.sat.orbit_state = OrbitState[str(value).upper()]
 
-def on_polarisation_channels(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_polarisation_channels(product: Mapping[str, Any], value: Any, target_item: Item):
     SarExtension.ensure_has_extension(target_item, add_if_missing=True)
-    target_item.ext.sar.polarizations = [Polarization[name] for name in str(value).split("&")]
+    target_item.ext.sar.polarizations = [
+        Polarization[name] for name in str(value).split("&")
+    ]
 
-def on_product_type(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_product_type(product: Mapping[str, Any], value: Any, target_item: Item):
     product_ext = ProductExtension.ext(target_item, add_if_missing=True)
     product_ext.product_type = value
 
-def on_timeliness(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
-    product_ext = ProductExtension.ext(target_item, add_if_missing=True)
-    product_ext.apply(
-        timeliness_category = value,
-        timeliness = "N/A"
-    )
 
-def on_processing_center(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+def on_timeliness(product: Mapping[str, Any], value: Any, target_item: Item):
+    product_ext = ProductExtension.ext(target_item, add_if_missing=True)
+    product_ext.apply(timeliness_category=value, timeliness="N/A")
+
+
+def on_processing_center(product: Mapping[str, Any], value: Any, target_item: Item):
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.facility = value
 
-def on_processing_level(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
-    _level_map ={
-        "LEVEL1": "L1", 
-        "LEVEL2": "L2", 
-        "LEVEL3": "L3", 
-        "S2MSI1C": "L1", 
-        "S2MSI2A": "L2", 
-        "1": "L1", 
-        "2": "L2"
-    }
 
+def on_processing_level(product: Mapping[str, Any], value: Any, target_item: Item):
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
-    proc_ext.level = _level_map.get(value, value)
+    proc_ext.level = LEVEL_MAP.get(value, value)
 
-def on_processing_date(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_processing_date(product: Mapping[str, Any], value: Any, target_item: Item):
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.processing_datetime = _parse_rfc3339(str(value))
 
-def on_processor_name(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_processor_name(product: Mapping[str, Any], value: Any, target_item: Item):
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.software = value
 
-def on_processor_version(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_processor_version(product: Mapping[str, Any], value: Any, target_item: Item):
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.version = value
 
-def on_operational_mode(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_operational_mode(product: Mapping[str, Any], value: Any, target_item: Item):
     SarExtension.ensure_has_extension(target_item, add_if_missing=True)
     target_item.ext.sar.instrument_mode = str(value)
 
 
-def on_swath_identifier(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+def on_swath_identifier(product: Mapping[str, Any], value: Any, target_item: Item):
     # CDSE: "IW1 IW2 IW3"
     SarExtension.ensure_has_extension(target_item, add_if_missing=True)
 
     beam_ids = [s.strip() for s in str(value).split() if s.strip()]
-    target_item.properties["sar:beam_ids"] = beam_ids # sar ext current implementation does not support beam_ids
+    target_item.properties["sar:beam_ids"] = (
+        beam_ids  # sar ext current implementation does not support beam_ids
+    )
 
 
-def on_platform_short_name(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+def on_platform_short_name(product: Mapping[str, Any], value: Any, target_item: Item):
     # Example: SENTINEL-1 -> sentinel-1
     target_item.properties["constellation"] = str(value).lower()
-    target_item.properties["platform"] = str(value).lower() + [attribute.get("Value").lower() for attribute in product.get("Attributes", {}) if attribute.get("Name") == "platformSerialIdentifier"][0]
+    target_item.properties["platform"] = (
+        str(value).lower()
+        + [
+            attribute.get("Value").lower()
+            for attribute in product.get("Attributes", {})
+            if attribute.get("Name") == "platformSerialIdentifier"
+        ][0]
+    )
 
-def on_instrument_short_name(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_instrument_short_name(product: Mapping[str, Any], value: Any, target_item: Item):
     # Example: SAR -> ["sar"]
     target_item.properties["instruments"] = [str(value).lower()]
 
-def on_cloud_cover(
-    product: Mapping[str, Any],
-    value: Any,
-    target_item: Item
-):
+
+def on_cloud_cover(product: Mapping[str, Any], value: Any, target_item: Item):
     EOExtension.ensure_has_extension(target_item, add_if_missing=True)
     target_item.ext.eo.cloud_cover = float(value)
+
 
 DISPATCH_REGISTRY: Dict[str, Handler] = {
     "beginningDateTime": on_beginning_datetime,
@@ -247,10 +178,11 @@ DISPATCH_REGISTRY: Dict[str, Handler] = {
     "swathIdentifier": on_swath_identifier,
     "platformShortName": on_platform_short_name,
     "instrumentShortName": on_instrument_short_name,
-    "cloudCover": on_cloud_cover
+    "cloudCover": on_cloud_cover,
 }
 
 # Convert
+
 
 def _bbox_from_geojson_geometry(geom: Dict[str, Any]) -> List[float]:
     """
@@ -282,8 +214,7 @@ def _bbox_from_geojson_geometry(geom: Dict[str, Any]) -> List[float]:
 
 
 def odata_products_to_stac_item_collection(
-    url: str,
-    odata: Mapping[str, Any]
+    url: str, odata: Mapping[str, Any]
 ) -> ItemCollection:
     """
     Convert an OData Products response to a PySTAC ItemCollection.
@@ -298,12 +229,16 @@ def odata_products_to_stac_item_collection(
     items: List[Item] = []
 
     for i, product in enumerate(products):
-        logger.debug("------------------------------------------------------------------------")
+        logger.debug(
+            "------------------------------------------------------------------------"
+        )
         logger.debug(f"Processing Product {i + 1} of {len(products)}")
 
         geom = product.get("GeoFootprint")
         if not geom:
-            logger.warning(f"Product {i + 1} of {len(products)} with ID '{product.get('Id')}' does not declare the 'GeoFootprint' field, skipping it.")
+            logger.warning(
+                f"Product {i + 1} of {len(products)} with ID '{product.get('Id')}' does not declare the 'GeoFootprint' field, skipping it."
+            )
             # Skip products without geometry (or raise if you prefer)
             continue
 
@@ -314,11 +249,11 @@ def odata_products_to_stac_item_collection(
         properties: dict[str, Any] = {}
 
         item: Item = Item(
-            id=str(product.get('Id')),
+            id=str(product.get("Id")),
             geometry=geom,
             bbox=bbox,
             datetime=dt,
-            properties=properties
+            properties=properties,
         )
 
         item.add_link(
@@ -326,7 +261,7 @@ def odata_products_to_stac_item_collection(
                 rel=RelType.DERIVED_FROM,
                 target=f"{url}?$filter=Name%20eq%20%27{product.get('Name')}%27&$expand=Assets&$expand=Attributes#OData.CSC.StringAttribute",
                 media_type="application/json",
-                title="OData product entry"
+                title="OData product entry",
             )
         )
 
@@ -338,14 +273,14 @@ def odata_products_to_stac_item_collection(
                     # media_type=product.get("ContentType") or product.get("@odata.mediaContentType"),
                     roles=["data"],
                     title=str(location.get("FormatType")),
-                    extra_fields={
-                        "file:size": location.get("ContentLength")
-                    },
+                    extra_fields={"file:size": location.get("ContentLength")},
                 )
 
                 checksums = location.get("Checksum") or []
                 for checksum in checksums:
-                    asset.extra_fields[f"checksum:{checksum.get('Algorithm')}"] = checksum.get("Value")
+                    asset.extra_fields[f"checksum:{checksum.get('Algorithm')}"] = (
+                        checksum.get("Value")
+                    )
 
                 item.add_asset(str(location.get("FormatType")), asset)
         else:
@@ -353,7 +288,8 @@ def odata_products_to_stac_item_collection(
             if "S3Path" in product:
                 asset = Asset(
                     href=str(product.get("S3Path")),
-                    media_type=product.get("ContentType") or product.get("@odata.mediaContentType"),
+                    media_type=product.get("ContentType")
+                    or product.get("@odata.mediaContentType"),
                     roles=["data"],
                     title=product.get("Name"),
                     extra_fields={
@@ -367,12 +303,8 @@ def odata_products_to_stac_item_collection(
             zip_asset = Asset(
                 href=f"https://download.dataspace.copernicus.eu/odata/v1/Products({product.get('Id')})/$value",
                 media_type="application/zip",
-                roles=[
-                    "data",
-                    "metadata",
-                    "archive"
-                ],
-                title="application/zip"
+                roles=["data", "metadata", "archive"],
+                title="application/zip",
             )
             item.add_asset("Product", zip_asset)
 
@@ -383,12 +315,13 @@ def odata_products_to_stac_item_collection(
             value: Any = attribute.get("Value")
             if name in DISPATCH_REGISTRY:
                 DISPATCH_REGISTRY[name](product, value, item)
-            elif name in [
-                "platformSerialIdentifier"]:
+            elif name in ["platformSerialIdentifier"]:
                 # Handled in on_platform_short_name
                 continue
             else:
-                logger.warning(f"Attribute '{name}' not yet managed by the STAC spec or extensions.")
+                logger.warning(
+                    f"Attribute '{name}' not yet managed by the STAC spec or extensions."
+                )
 
         logger.debug(f"Appending STAC Item '{item.id}")
 
@@ -397,14 +330,6 @@ def odata_products_to_stac_item_collection(
     return ItemCollection(items, clone_items=True)
 
 
-def to_stac_item_collection(
-    url: str,
-    odata: Mapping[str, Any],
-    output_stream: TextIO
-):
+def to_stac_item_collection(url: str, odata: Mapping[str, Any], output_stream: TextIO):
     item_collection: ItemCollection = odata_products_to_stac_item_collection(url, odata)
-    json.dump(
-        item_collection.to_dict(),
-        output_stream,
-        indent=2
-    )
+    json.dump(item_collection.to_dict(), output_stream, indent=2)

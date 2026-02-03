@@ -34,5 +34,5 @@ SENTINEL5P = {
     "baselineCollection": "String",
     "processingBaseline": "String",
     "instrumentShortName": "String",
-    "platformSerialIdentifier": "String"
+    "platformSerialIdentifier": "String",
 }

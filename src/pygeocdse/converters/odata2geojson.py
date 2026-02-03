@@ -16,15 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    TextIO,
-    Optional
-)
+from typing import Any, Callable, Dict, List, Mapping, TextIO, Optional
 import geojson
 
 
@@ -161,12 +153,7 @@ def odata_products_to_feature_collection_geojson(
 def to_feature_collection_geojson(
     odata: Mapping[str, Any],
     output_stream: TextIO,
-    opts: FeatureBuildOptions = FeatureBuildOptions()
+    opts: FeatureBuildOptions = FeatureBuildOptions(),
 ):
     feature_collection = odata_products_to_feature_collection_geojson(odata, opts)
-    output_stream.write(
-        geojson.dumps(
-            feature_collection,
-            indent=2
-        )
-    )
+    output_stream.write(geojson.dumps(feature_collection, indent=2))

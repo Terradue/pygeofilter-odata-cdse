@@ -46,5 +46,5 @@ SENTINEL1 = {
     "platformSerialIdentifier": "String",
     "instrumentConfigurationID": "Integer",
     "startTimeFromAscendingNode": "Double",
-    "completionTimeFromAscendingNode": "Double"
+    "completionTimeFromAscendingNode": "Double",
 }

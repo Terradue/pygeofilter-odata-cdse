@@ -26,5 +26,5 @@ SENTINEL1RTC = {
     "instrumentShortName": "String",
     "relativeOrbitNumber": "Integer",
     "polarisationChannels": "String",
-    "platformSerialIdentifier": "String"
+    "platformSerialIdentifier": "String",
 }

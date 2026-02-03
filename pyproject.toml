@@ -77,6 +77,15 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
+[tool.hatch.envs.dev]
+description = "Development environment"
+dependencies = [
+  "ruff",
+  "nose2"
+]
 
-[tool.hatch.envs.default.scripts]
-test = "hatch run nose2"
+
+[tool.hatch.envs.dev.scripts]
+lint = "ruff format src tests"
+check = "ruff check --fix src tests"
+test = "nose2"

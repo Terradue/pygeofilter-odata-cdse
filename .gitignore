@@ -176,3 +176,5 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+.vscode/settings.json
+test/a/b/c/item_collection.json

@@ -14,10 +14,7 @@
 
 from __future__ import annotations
 
-from datetime import (
-    datetime,
-    timezone
-)
+from datetime import datetime, timezone
 from pygeofilter.ast import (
     And,
     AstType,
@@ -25,27 +22,15 @@ from pygeofilter.ast import (
     Equal,
     GeometryIntersects,
     Or,
-    TimeAfter,
-    TimeBefore
 )
 from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
 from pygeofilter.util import parse_datetime
-from pygeofilter.values import (
-    Geometry
-)
-from shapely.geometry import (
-    box,
-    mapping
-)
-from typing import (
-    Sequence,
-    Tuple
-)
+from pygeofilter.values import Geometry
+from shapely.geometry import box, mapping
+from typing import Sequence, Tuple
 
-def _and_concat(
-    left: AstType | None,
-    right: AstType
-) -> AstType:
+
+def _and_concat(left: AstType | None, right: AstType) -> AstType:
     """
     Flatten nested ANDs from `left` and `right`, then rebuild as a left-associated AND chain.
 
@@ -83,10 +68,8 @@ def _and_concat(
 
     return expr
 
-def collections_filter(
-    filter: AstType | None,
-    collections: Sequence[str]
-) -> AstType:
+
+def collections_filter(filter: AstType | None, collections: Sequence[str]) -> AstType:
     """
     Build a pygeofilter AST equivalent to:
 
@@ -112,23 +95,18 @@ def collections_filter(
 
     return _and_concat(filter, expr)
 
-def bbox_filter(
-    filter: AstType | None,
-    bbox: Tuple[float]
-) -> AstType:
+
+def bbox_filter(filter: AstType | None, bbox: Tuple[float]) -> AstType:
     geometry = box(*bbox)
 
     geometry_filter = GeometryIntersects(
-        Attribute("geometry"),
-        Geometry(mapping(geometry))
+        Attribute("geometry"), Geometry(mapping(geometry))
     )
 
     return _and_concat(filter, geometry_filter)
 
 
-def _as_utc(
-    datetime: str
-) -> datetime:
+def _as_utc(datetime: str) -> datetime:
     dt: datetime = parse_datetime(datetime)
     # pygeofilter.util.parse_datetime may return naive or tz-aware dt depending on input
     if dt.tzinfo is None:
@@ -136,10 +114,7 @@ def _as_utc(
     return dt.astimezone(timezone.utc)
 
 
-def datetime_or_interval_filter(
-    filter: AstType | None,
-    datetime: str
-) -> AstType:
+def datetime_or_interval_filter(filter: AstType | None, datetime: str) -> AstType:
     datetime = datetime.strip()
     if not datetime:
         raise ValueError("Empty datetime/interval string")
@@ -156,26 +131,20 @@ def datetime_or_interval_filter(
                     "op": "t_begins",
                     "args": [
                         {"property": "ContentDate/Start"},
-                        {"timestamp": start_raw}
-                    ]
+                        {"timestamp": start_raw},
+                    ],
                 },
                 {
                     "op": "t_ends",
-                    "args": [
-                        {"property": "ContentDate/End"},
-                        {"timestamp": end_raw}
-                    ]
-                }
-            ]
+                    "args": [{"property": "ContentDate/End"}, {"timestamp": end_raw}],
+                },
+            ],
         }
     else:
         # single instant/date
         datetime_filter = {
             "op": "t_begins",
-            "args": [
-                {"property": "ContentDate/Start"},
-                {"timestamp": datetime}
-            ]
+            "args": [{"property": "ContentDate/Start"}, {"timestamp": datetime}],
         }
 
     return _and_concat(filter, parse_cql2_json(datetime_filter))
