@@ -34,6 +34,7 @@ from pystac.extensions.sat import (
     OrbitState,
     SatExtension
 )
+from pystac.extensions.eo import EOExtension
 from typing import (
     Any,
     Dict,
@@ -54,7 +55,7 @@ def _parse_rfc3339(dt: str) -> datetime:
 # Handlers
 
 class Handler(Protocol):
-    def __call__(self, value: Any, target_item: Item) -> None: ...
+    def __call__(self, product: Mapping[str, Any], value: Any, target_item: Item) -> None: ...
 
 
 def _set_date(
@@ -66,6 +67,7 @@ def _set_date(
 
 
 def on_beginning_datetime(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -73,6 +75,7 @@ def on_beginning_datetime(
 
 
 def on_ending_datetime(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -80,6 +83,7 @@ def on_ending_datetime(
 
 
 def on_orbit_number(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -87,6 +91,7 @@ def on_orbit_number(
     target_item.ext.sat.absolute_orbit=value
 
 def on_relative_orbit_number(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -94,6 +99,7 @@ def on_relative_orbit_number(
     target_item.ext.sat.relative_orbit=value
 
 def on_orbit_direction(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -101,6 +107,7 @@ def on_orbit_direction(
     target_item.ext.sat.orbit_state=OrbitState[str(value).upper()]
 
 def on_polarisation_channels(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -108,6 +115,7 @@ def on_polarisation_channels(
     target_item.ext.sar.polarizations = [Polarization[name] for name in str(value).split("&")]
 
 def on_product_type(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -115,6 +123,7 @@ def on_product_type(
     product_ext.product_type = value
 
 def on_timeliness(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -125,6 +134,7 @@ def on_timeliness(
     )
 
 def on_processing_center(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -132,13 +142,25 @@ def on_processing_center(
     proc_ext.facility = value
 
 def on_processing_level(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
+    _level_map ={
+        "LEVEL1": "L1", 
+        "LEVEL2": "L2", 
+        "LEVEL3": "L3", 
+        "S2MSI1C": "L1", 
+        "S2MSI2A": "L2", 
+        "1": "L1", 
+        "2": "L2"
+    }
+
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
-    proc_ext.level = value
+    proc_ext.level = _level_map.get(value, value)
 
 def on_processing_date(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -146,6 +168,7 @@ def on_processing_date(
     proc_ext.processing_datetime = _parse_rfc3339(str(value))
 
 def on_processor_name(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
@@ -153,11 +176,58 @@ def on_processor_name(
     proc_ext.software = value
 
 def on_processor_version(
+    product: Mapping[str, Any],
     value: Any,
     target_item: Item
 ):
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.version = value
+
+def on_operational_mode(
+    product: Mapping[str, Any],
+    value: Any,
+    target_item: Item
+):
+    SarExtension.ensure_has_extension(target_item, add_if_missing=True)
+    target_item.ext.sar.instrument_mode = str(value)
+
+
+def on_swath_identifier(
+    product: Mapping[str, Any],
+    value: Any,
+    target_item: Item
+):
+    # CDSE: "IW1 IW2 IW3"
+    SarExtension.ensure_has_extension(target_item, add_if_missing=True)
+
+    beam_ids = [s.strip() for s in str(value).split() if s.strip()]
+    target_item.properties["sar:beam_ids"] = beam_ids # sar ext current implementation does not support beam_ids
+
+
+def on_platform_short_name(
+    product: Mapping[str, Any],
+    value: Any,
+    target_item: Item
+):
+    # Example: SENTINEL-1 -> sentinel-1
+    target_item.properties["constellation"] = str(value).lower()
+    target_item.properties["platform"] = str(value).lower() + [attribute.get("Value").lower() for attribute in product.get("Attributes", {}) if attribute.get("Name") == "platformSerialIdentifier"][0]
+
+def on_instrument_short_name(
+    product: Mapping[str, Any],
+    value: Any,
+    target_item: Item
+):
+    # Example: SAR -> ["sar"]
+    target_item.properties["instruments"] = [str(value).lower()]
+
+def on_cloud_cover(
+    product: Mapping[str, Any],
+    value: Any,
+    target_item: Item
+):
+    EOExtension.ensure_has_extension(target_item, add_if_missing=True)
+    target_item.ext.eo.cloud_cover = float(value)
 
 DISPATCH_REGISTRY: Dict[str, Handler] = {
     "beginningDateTime": on_beginning_datetime,
@@ -172,7 +242,12 @@ DISPATCH_REGISTRY: Dict[str, Handler] = {
     "processingLevel": on_processing_level,
     "processingDate": on_processing_date,
     "processorName": on_processor_name,
-    "processorVersion": on_processor_version
+    "processorVersion": on_processor_version,
+    "operationalMode": on_operational_mode,
+    "swathIdentifier": on_swath_identifier,
+    "platformShortName": on_platform_short_name,
+    "instrumentShortName": on_instrument_short_name,
+    "cloudCover": on_cloud_cover
 }
 
 # Convert
@@ -307,9 +382,13 @@ def odata_products_to_stac_item_collection(
             name: str = str(attribute.get("Name"))
             value: Any = attribute.get("Value")
             if name in DISPATCH_REGISTRY:
-                DISPATCH_REGISTRY[name](value, item)
+                DISPATCH_REGISTRY[name](product, value, item)
+            elif name in [
+                "platformSerialIdentifier"]:
+                # Handled in on_platform_short_name
+                continue
             else:
-                logger.warning(f"Attribute '{name}' not supported yet.")
+                logger.warning(f"Attribute '{name}' not yet managed by the STAC spec or extensions.")
 
         logger.debug(f"Appending STAC Item '{item.id}")
 
