@@ -18,7 +18,6 @@ from pygeocdse.evaluator import http_invoke
 
 
 class TestCDSEIntegration(unittest.TestCase):
-
     def setUp(self):
         pass
 
@@ -26,20 +25,8 @@ class TestCDSEIntegration(unittest.TestCase):
         cql2_filter = {
             "op": "and",
             "args": [
-                {
-                    "op": "eq",
-                    "args": [
-                        {"property": "Collection/Name"},
-                        "SENTINEL-2"
-                    ]
-                },
-                {
-                    "op": "eq",
-                    "args": [
-                        {"property": "productType"},
-                        "S2MSI1C"
-                    ]
-                },
+                {"op": "eq", "args": [{"property": "Collection/Name"}, "SENTINEL-2"]},
+                {"op": "eq", "args": [{"property": "productType"}, "S2MSI1C"]},
                 {
                     "op": "s_intersects",
                     "args": [
@@ -57,16 +44,18 @@ class TestCDSEIntegration(unittest.TestCase):
                             ],
                         },
                     ],
-                }
+                },
             ],
         }
 
-        data = http_invoke("https://catalogue.dataspace.copernicus.eu/odata/v1/Products", cql2_filter)
+        data = http_invoke(
+            "https://catalogue.dataspace.copernicus.eu/odata/v1/Products", cql2_filter
+        )
 
-        self.assertIsNotNone(data, f"Expected JSON data")
+        self.assertIsNotNone(data, "Expected JSON data")
 
     def test_cdse_invokation_2(self):
-        '''
+        """
         Collection/Name eq 'SENTINEL-1'
         and (Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'IW_GRHD_1S')
         or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'IW_GRDH_1S')
@@ -79,18 +68,12 @@ class TestCDSEIntegration(unittest.TestCase):
         or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S5_GRDH_1S')
         or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S6_GRDH_1S'))
         and OData.CSC.Intersects(area=geography'SRID=4326;POLYGON((-117.861 33.138,-102.217 32.027,-98.965 29.306,-96.592 27.216,-88.945 26.667,-85.078 26.274,-81.123 26.589,-72.51 26.746,-69.961 25.006,-66.973 23.161,-61.787 19.311,-56.953 14.52,-51.152 9.882,-41.748 2.636,-30.586 -3.864,-29.18 -17.644,-47.988 -35.317,-54.844 -54.877,-74.004 -57.421,-86.484 -40.581,-86.484 -19.643,-98.262 -1.23,-114.258 20.797,-119.004 29.382,-117.861 33.138))')
-        '''
+        """
 
         cql2_filter = {
             "op": "and",
             "args": [
-                {
-                    "op": "eq",
-                    "args": [
-                        {"property": "Collection/Name"},
-                        "SENTINEL-1"
-                    ]
-                },
+                {"op": "eq", "args": [{"property": "Collection/Name"}, "SENTINEL-1"]},
                 {
                     "op": "in",
                     "args": [
@@ -105,9 +88,9 @@ class TestCDSEIntegration(unittest.TestCase):
                             "S3_GRDH_1S",
                             "S4_GRDH_1S",
                             "S5_GRDH_1S",
-                            "S6_GRDH_1S"
-                        ]
-                    ]
+                            "S6_GRDH_1S",
+                        ],
+                    ],
                 },
                 {
                     "op": "s_intersects",
@@ -141,15 +124,17 @@ class TestCDSEIntegration(unittest.TestCase):
                                     [-98.262, -1.23],
                                     [-114.258, 20.797],
                                     [-119.004, 29.382],
-                                    [-117.861, 33.138]
+                                    [-117.861, 33.138],
                                 ]
                             ],
                         },
                     ],
-                }
+                },
             ],
         }
 
-        data = http_invoke("https://catalogue.dataspace.copernicus.eu/odata/v1/Products", cql2_filter)
+        data = http_invoke(
+            "https://catalogue.dataspace.copernicus.eu/odata/v1/Products", cql2_filter
+        )
 
-        self.assertIsNotNone(data, f"Expected JSON data")
+        self.assertIsNotNone(data, "Expected JSON data")

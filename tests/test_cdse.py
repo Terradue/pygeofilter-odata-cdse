@@ -14,59 +14,49 @@
 
 import unittest
 
-from loguru import logger
-from pygeofilter.parsers.cql2_json import parse as json_parse
-from pygeofilter.util import IdempotentDict
 
 from pygeocdse.evaluator import to_cdse
 
 
 class TestCDSEEvaluator(unittest.TestCase):
-
     def setUp(self):
         pass
 
     def test_comparison_le(self):
         cql2_filter = {"op": "<=", "args": [{"property": "cloudCover"}, 20]}
         expected = "Attributes/OData.CSC.DoubleAttribute/any(att:att/Name eq 'cloudCover' and att/OData.CSC.DoubleAttribute/Value le 20)"
-        self.assertEqual(
-            expected, to_cdse(cql2_filter)
-        )
+        self.assertEqual(expected, to_cdse(cql2_filter))
 
     def test_comparison_ge(self):
         cql2_filter = {"op": ">=", "args": [{"property": "cloudCover"}, 20]}
         expected = "Attributes/OData.CSC.DoubleAttribute/any(att:att/Name eq 'cloudCover' and att/OData.CSC.DoubleAttribute/Value ge 20)"
-        self.assertEqual(
-            expected, to_cdse(cql2_filter)
-        )
+        self.assertEqual(expected, to_cdse(cql2_filter))
 
     def test_comparison_string(self):
-        cql2_filter = {"op": "=", "args": [{"property": "platformShortName"}, "Sentinel-2A"]}
+        cql2_filter = {
+            "op": "=",
+            "args": [{"property": "platformShortName"}, "Sentinel-2A"],
+        }
         expected = "Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'platformShortName' and att/OData.CSC.StringAttribute/Value eq 'Sentinel-2A')"  # this should be all single quotes??
-        self.assertEqual(
-            expected, to_cdse(cql2_filter)
-        )
+        self.assertEqual(expected, to_cdse(cql2_filter))
 
     def test_comparison_double(self):
         cql2_filter = {"op": "=", "args": [{"property": "cloudCover"}, 20]}
         expected = "Attributes/OData.CSC.DoubleAttribute/any(att:att/Name eq 'cloudCover' and att/OData.CSC.DoubleAttribute/Value eq 20)"
-        self.assertEqual(
-            expected, to_cdse(cql2_filter)
-        )
+        self.assertEqual(expected, to_cdse(cql2_filter))
 
     def test_comparison_integer(self):
         cql2_filter = {"op": "=", "args": [{"property": "orbitNumber"}, 20]}
         expected = "Attributes/OData.CSC.IntegerAttribute/any(att:att/Name eq 'orbitNumber' and att/OData.CSC.IntegerAttribute/Value eq 20)"
-        self.assertEqual(
-            expected, to_cdse(cql2_filter)
-        )
+        self.assertEqual(expected, to_cdse(cql2_filter))
 
     def test_collection_name(self):
-        cql2_filter = {"op": "=", "args": [{"property": "Collection/Name"}, "SENTINEL-2"]}
+        cql2_filter = {
+            "op": "=",
+            "args": [{"property": "Collection/Name"}, "SENTINEL-2"],
+        }
         expected = "Collection/Name eq 'SENTINEL-2'"
-        self.assertEqual(
-            expected, to_cdse(cql2_filter)
-        )
+        self.assertEqual(expected, to_cdse(cql2_filter))
 
     def test_in(self):
         cql2_filter = {
@@ -83,16 +73,14 @@ class TestCDSEEvaluator(unittest.TestCase):
                     "S3_GRDH_1S",
                     "S4_GRDH_1S",
                     "S5_GRDH_1S",
-                    "S6_GRDH_1S"
-                ]
-            ]
+                    "S6_GRDH_1S",
+                ],
+            ],
         }
 
         expected = "(Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'IW_GRHD_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'IW_GRDH_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'EW_GRDM_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'EW_GRDH_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S1_GRDH_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S2_GRDH_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S3_GRDH_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S4_GRDH_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S5_GRDH_1S') or Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S6_GRDH_1S'))"
 
-        self.assertEqual(
-            expected, to_cdse(cql2_filter)
-        )
+        self.assertEqual(expected, to_cdse(cql2_filter))
 
     # write test for
     # Collection/Name eq 'SENTINEL-2'
@@ -115,7 +103,12 @@ class TestCDSEEvaluator(unittest.TestCase):
                     "op": "t_begins",
                     "args": [
                         {"property": "ContentDate/Start"},
-                        {"interval": ["2022-05-03T00:00:00.00Z", "2022-05-03T04:00:00.00Z"]},
+                        {
+                            "interval": [
+                                "2022-05-03T00:00:00.00Z",
+                                "2022-05-03T04:00:00.00Z",
+                            ]
+                        },
                     ],
                 },
             ],
@@ -124,6 +117,4 @@ class TestCDSEEvaluator(unittest.TestCase):
         expected = "Attributes/OData.CSC.DoubleAttribute/any(att:att/Name eq 'cloudCover' and att/OData.CSC.DoubleAttribute/Value le 10) and Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'S2MSI2A') and Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'orbitDirection' and att/OData.CSC.StringAttribute/Value eq 'ASCENDING') and ContentDate/Start ge 2022-05-03T00:00:00Z and ContentDate/Start le 2022-05-03T04:00:00Z"
         current = to_cdse(cql2_filter)
 
-        self.assertEqual(
-            expected, current
-        )
+        self.assertEqual(expected, current)

@@ -18,7 +18,6 @@ from pygeocdse.odata_attributes import get_attribute_type
 
 
 class TestOdataAttributes(unittest.TestCase):
-
     def test_get_attribute_type_string(self):
         attribute_name = "platformShortName"
         expected = "String"

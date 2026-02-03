@@ -1,0 +1,18 @@
+version: 3
+
+tasks:
+
+  test: 
+    desc: Run unit tests
+    cmds:
+      - hatch -e default run nose2 --verbose
+
+  check:
+    desc: Run code quality checks
+    cmds:
+      - hatch run dev:check
+
+  lint:
+    desc: Run linters
+    cmds:
+      - hatch run dev:lint

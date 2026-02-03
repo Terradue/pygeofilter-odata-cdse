@@ -39,5 +39,5 @@ SENTINEL2 = {
     "relativeOrbitNumber": "Integer",
     "illuminationZenithAngle": "Double",
     "sourceProductOriginDate": "String",
-    "platformSerialIdentifier": "String"
+    "platformSerialIdentifier": "String",
 }

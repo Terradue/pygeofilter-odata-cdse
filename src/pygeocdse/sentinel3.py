@@ -46,5 +46,5 @@ SENTINEL3 = {
     "relativeOrbitNumber": "Integer",
     "freshInlandWaterCover": "Double",
     "lastRelativeOrbitNumber": "Integer",
-    "platformSerialIdentifier": "String"
+    "platformSerialIdentifier": "String",
 }

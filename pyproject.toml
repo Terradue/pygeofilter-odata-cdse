@@ -26,6 +26,9 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  "geojson",
+  "pystac @ git+https://github.com/Terradue/pystac.git@t2_extensions",
+  "click>=8.2.1",
   "pygeofilter>=0.3.1",
   "ipykernel",
   "shapely",
@@ -34,10 +37,16 @@ dependencies = [
   "requests"
 ]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [project.urls]
 Documentation = "https://github.com/Terradue/pygeofilter-odata-cdse#readme"
 Issues = "https://github.com/Terradue/pygeofilter-odata-cdse/issues"
 Source = "https://github.com/Terradue/pygeofilter-odata-cdse"
+
+[project.scripts]
+odata-client = "pygeocdse.cli:main"
 
 [tool.hatch.version]
 path = "src/pygeocdse/__about__.py"
@@ -68,6 +77,15 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
+[tool.hatch.envs.dev]
+description = "Development environment"
+dependencies = [
+  "ruff",
+  "nose2"
+]
 
-[tool.hatch.envs.default.scripts]
-test = "hatch run nose2"
+
+[tool.hatch.envs.dev.scripts]
+lint = "ruff format src tests"
+check = "ruff check --fix src tests"
+test = "nose2"
