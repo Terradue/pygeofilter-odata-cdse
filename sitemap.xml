@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://terradue.github.io/pygeofilter-odata-cdse/</loc>
+         <lastmod>2026-02-04</lastmod>
+    </url>
+    <url>
+         <loc>https://terradue.github.io/pygeofilter-odata-cdse/attributes/</loc>
+         <lastmod>2026-02-04</lastmod>
+    </url>
+    <url>
+         <loc>https://terradue.github.io/pygeofilter-odata-cdse/cli/</loc>
+         <lastmod>2026-02-04</lastmod>
+    </url>
+    <url>
+         <loc>https://terradue.github.io/pygeofilter-odata-cdse/geographical_op/</loc>
+         <lastmod>2026-02-04</lastmod>
+    </url>
+    <url>
+         <loc>https://terradue.github.io/pygeofilter-odata-cdse/logical_comparison_op/</loc>
+         <lastmod>2026-02-04</lastmod>
+    </url>
+    <url>
+         <loc>https://terradue.github.io/pygeofilter-odata-cdse/odata-stac-crosswalk/</loc>
+         <lastmod>2026-02-04</lastmod>
+    </url>
+    <url>
+         <loc>https://terradue.github.io/pygeofilter-odata-cdse/temporal_op/</loc>
+         <lastmod>2026-02-04</lastmod>
+    </url>
+</urlset>
