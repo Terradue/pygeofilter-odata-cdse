@@ -30,7 +30,6 @@ from pygeofilter.parsers.ecql import parse as parse_ecql
 from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
 from typing import Any, List, Mapping, Tuple
 import click
-import requests
 import sys
 
 
@@ -180,10 +179,7 @@ def search_cmd(
 
         cql2_json_str = to_cql2(ast)
         result: Mapping[str, Any] = http_invoke(
-            base_url=url,
-            cql2_filter=cql2_json_str,
-            limit=limit,
-            max_items=max_items
+            base_url=url, cql2_filter=cql2_json_str, limit=limit, max_items=max_items
         )
 
         if save:
@@ -195,9 +191,7 @@ def search_cmd(
             )
         else:
             to_stac_item_collection(url, result, sys.stdout)
-            logger.success(
-                "Results successfully converted to STAC Item Collection."
-            )
+            logger.success("Results successfully converted to STAC Item Collection.")
 
         logger.info(
             "------------------------------------------------------------------------"
