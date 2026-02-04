@@ -13,13 +13,26 @@
 # limitations under the License.
 
 from builtins import isinstance
-from datetime import date, datetime, timedelta
-from pygeocdse.odata_attributes import get_attribute_type
+from datetime import (
+    date,
+    datetime,
+    timedelta
+)
+from loguru import logger
+from pygeocdse.odata_attributes import ALL_ATTRIBUTES, get_attribute_type
 from pygeofilter import ast, values
 from pygeofilter.backends.evaluator import Evaluator, handle
 from pygeofilter.parsers.cql2_json import parse as json_parse
-from pygeofilter.util import IdempotentDict, parse_datetime
-from typing import Any, Mapping, Optional
+from pygeofilter.util import (
+    IdempotentDict,
+    parse_datetime
+)
+from typing import (
+    Any,
+    Dict,
+    Mapping,
+    Optional
+)
 import json
 import requests
 import shapely
@@ -49,9 +62,8 @@ def date_format(date: str | datetime):
 
 
 class CDSEEvaluator(Evaluator):
-    def __init__(
-        self, attribute_map: Mapping[str, str], function_map: Mapping[str, str]
-    ):
+
+    def __init__(self, attribute_map: Mapping[str, str], function_map: Mapping[str, str]):
         self.attribute_map = attribute_map
         self.function_map = function_map
 
@@ -69,7 +81,7 @@ class CDSEEvaluator(Evaluator):
 
     @handle(ast.Comparison, subclasses=True)
     def comparison(self, node, lhs, rhs):
-        if "Collection/Name" == node.lhs.name:
+        if 'Collection/Name' == node.lhs.name:
             return f"{node.lhs.name} {COMPARISON_OP_MAP.get(node.op)} {rhs}"
 
         if "Date" in lhs:
@@ -110,18 +122,16 @@ class CDSEEvaluator(Evaluator):
     @handle(ast.In)
     def in_(self, node, lhs, *options):
         attr_type = get_attribute_type(node.lhs.name)
-        mapper = (
-            lambda rhs: f"Attributes/OData.CSC.{attr_type}Attribute/any(att:att/Name eq {lhs} and att/OData.CSC.{attr_type}Attribute/Value eq {rhs})"
-        )
+        mapper = lambda rhs: f"Attributes/OData.CSC.{attr_type}Attribute/any(att:att/Name eq {lhs} and att/OData.CSC.{attr_type}Attribute/Value eq {rhs})"
         return "(" + " or ".join(map(mapper, options)) + ")"
 
     @handle(ast.IsNull)
     def null(self, node, lhs):
         return f"{lhs} IS {'NOT ' if node.not_ else ''}NULL"
 
-    """
+    '''
     Time comparison handling
-    """
+    '''
 
     @handle(ast.TimeAfter)
     def timeAfter(self, node, lhs, rhs):
@@ -166,9 +176,7 @@ class CDSEEvaluator(Evaluator):
     @handle(values.Interval)
     def interval(self, node, start, end):
         if isinstance(node.start, timedelta) and isinstance(node.end, timedelta):
-            raise ValueError(
-                f"Both 'start' {start} and 'end' {end} parameters cannot be time deltas"
-            )
+            raise ValueError(f"Both 'start' {start} and 'end' {end} parameters cannot be time deltas")
 
         if isinstance(node.start, timedelta):
             return values.Interval(node.end - node.start, node.end)
@@ -177,9 +185,9 @@ class CDSEEvaluator(Evaluator):
         else:
             return node
 
-    """
+    '''
     Spatial comparison handling
-    """
+    '''
 
     @handle(ast.GeometryIntersects, subclasses=True)
     def geometry_intersects(self, node, lhs, rhs):
@@ -209,35 +217,40 @@ class CDSEEvaluator(Evaluator):
     def literal(self, node):
         if isinstance(node, str):
             return f"'{node}'"
-        elif (isinstance(node, date) or isinstance(node, datetime)) and not isinstance(
-            node, timedelta
-        ):
+        elif (isinstance(node, date) or isinstance(node, datetime)) and not isinstance(node, timedelta):
             return date_format(node)
         else:
             # TODO:
             return str(node)
 
 
-def to_cdse(cql2_filter: str | dict) -> str:
+def to_cdse(cql2_filter: str | Dict[str, Any]) -> str:
     return to_cdse_where(json_parse(cql2_filter), IdempotentDict())
 
 
 def to_cdse_where(
     root: ast.AstType,
     field_mapping: Mapping[str, str],
-    function_map: Optional[Mapping[str, str]] = None,
+    function_map: Optional[Mapping[str, str]]=None,
 ) -> str:
     return CDSEEvaluator(field_mapping, function_map or {}).evaluate(root)
 
 
 def http_invoke(
     base_url: str,
-    cql2_filter: str | dict,
+    cql2_filter: str | Dict[str, Any],
+    limit: int = 20,
+    max_items: int = 200,
 ) -> Mapping[str, Any]:
-    current_filter = to_cdse(cql2_filter)
-    url = f"{base_url}?$filter={current_filter}"
-    print(url)
-    response = requests.get(url)
+    current_filter: str = to_cdse(cql2_filter)
+    url: str = f"{base_url}?$filter={current_filter}&$top={max_items}&$expand=Assets&$expand=Attributes&$expand=Locations"
+
+    logger.debug(f"Invoking {url}...")
+
+    response = requests.get(
+        url=url, headers={"Prefer": f"odata.maxpagesize={limit}"}
+    )
     response.raise_for_status()  # Raise an error for HTTP error codes
     data = response.json()
+
     return data

@@ -17,7 +17,7 @@ from __future__ import annotations
 from enum import auto, Enum
 from loguru import logger
 from pathlib import Path
-from pygeocdse.evaluator import to_cdse
+from pygeocdse.evaluator import http_invoke
 from pygeocdse.ast_utils import (
     bbox_filter,
     collections_filter,
@@ -152,8 +152,8 @@ def search_cmd(
     filter_lang: str | None,
     sortby: List[str] | None,
     fields: List[str] | None,
-    limit: int | None,
-    max_items: int | None,
+    limit: int,
+    max_items: int,
     method: HttpMethod | None,
     save: Path | None,
 ):
@@ -179,28 +179,24 @@ def search_cmd(
             )
 
         cql2_json_str = to_cql2(ast)
-        transpiled_filter = to_cdse(cql2_json_str)
-        filter_url = f"{url}?$filter={transpiled_filter}&$top={max_items}&$expand=Assets&$expand=Attributes&$expand=Locations"
-
-        logger.debug(f"Invoking {filter_url}...")
-
-        response = requests.get(
-            url=filter_url, headers={"Prefer": f"odata.maxpagesize={limit}"}
+        result: Mapping[str, Any] = http_invoke(
+            base_url=url,
+            cql2_filter=cql2_json_str,
+            limit=limit,
+            max_items=max_items
         )
-        response.raise_for_status()
-        result: Mapping[str, Any] = response.json()
 
         if save:
             save.parent.mkdir(parents=True, exist_ok=True)
             with save.open("w") as output_stream:
                 to_stac_item_collection(url, result, output_stream)
             logger.success(
-                f"'{filter_url}' results successfully converted to STAC Item Collection to {save.absolute()}."
+                f"'Results successfully converted to STAC Item Collection to {save.absolute()}."
             )
         else:
             to_stac_item_collection(url, result, sys.stdout)
             logger.success(
-                f"'{filter_url}' results successfully converted to STAC Item Collection."
+                "Results successfully converted to STAC Item Collection."
             )
 
         logger.info(
