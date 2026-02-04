@@ -1,5 +1,7 @@
 # CDSE OData → STAC crosswalk
 
+## Attribute fields
+
  attribute                                  | STAC (core / extension) | STAC field / property                                | Transformation applied                                                                                                                                                                    |
 | ------------------------------------------------ | ----------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `OriginDate` *(product top-level field)*         | **STAC Core**           | `datetime`                                           | Parsed RFC3339 timestamp via `_parse_rfc3339`, assigned to `Item.datetime`.                                                                                                               |
