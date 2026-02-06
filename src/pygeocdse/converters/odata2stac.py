@@ -54,7 +54,9 @@ class Handler(Protocol):
 
 
 def _set_date(target_property: str, value: Any, target_item: Item):
-    target_item.properties[target_property] = _parse_rfc3339(str(value)).isoformat()
+    target_item.properties[target_property] = (
+        _parse_rfc3339(str(value)).isoformat().replace("+00:00", "Z")
+    )
 
 
 def on_beginning_datetime(product: Mapping[str, Any], value: Any, target_item: Item):
@@ -244,7 +246,19 @@ def odata_products_to_stac_item_collection(
 
         bbox = _bbox_from_geojson_geometry(geom)
 
-        dt = _parse_rfc3339(str(product.get("OriginDate")))
+        beginning = next(
+            (
+                attribute.get("Value")
+                for attribute in product.get("Attributes") or []
+                if attribute.get("Name") == "beginningDateTime"
+            ),
+            None,
+        )
+
+        if beginning is None:
+            raise ValueError(
+                f"Product {product.get('Id')} has no beginningDateTime attribute"
+            )
 
         properties: dict[str, Any] = {}
 
@@ -252,7 +266,7 @@ def odata_products_to_stac_item_collection(
             id=str(product.get("Id")),
             geometry=geom,
             bbox=bbox,
-            datetime=dt,
+            datetime=_parse_rfc3339(str(beginning)),
             properties=properties,
         )
 
