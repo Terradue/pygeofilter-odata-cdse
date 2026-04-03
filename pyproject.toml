@@ -26,15 +26,17 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "geojson",
+  "geojson==3.2.0",
   "pystac @ git+https://github.com/Terradue/pystac.git@t2_extensions",
-  "click>=8.2.1",
-  "pygeofilter>=0.3.1",
-  "ipykernel",
-  "shapely",
-  "nose2",
-  "loguru",
-  "requests"
+  "click==8.3.1",
+  "pygeofilter==0.3.3",
+  "ipykernel==7.2.0",
+  "shapely==2.1.2",
+  "nose2==0.16.0",
+  "loguru==0.7.3",
+  "requests==2.33.1",
+  "lxml==6.0.2",
+  "pygml==0.3.2"
 ]
 
 [tool.hatch.metadata]
@@ -53,7 +55,7 @@ path = "src/pygeocdse/__about__.py"
 
 [tool.hatch.envs.types]
 extra-dependencies = [
-  "mypy>=1.0.0",
+  "mypy==1.19.1",
 ]
 [tool.hatch.envs.types.scripts]
 check = "mypy --install-types --non-interactive {args:src/pygeocdse tests}"
@@ -80,8 +82,8 @@ exclude_lines = [
 [tool.hatch.envs.dev]
 description = "Development environment"
 dependencies = [
-  "ruff",
-  "nose2"
+  "ruff==0.14.6",
+  "nose2==0.15.1"
 ]
 
 

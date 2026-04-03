@@ -19,6 +19,7 @@ from loguru import logger
 from pystac import Asset, Item, ItemCollection, Link, RelType
 from pystac.extensions.processing import ProcessingExtension
 from pystac.extensions.product import ProductExtension
+from pystac.extensions.sentinel1 import Sentinel1Extension
 from pystac.extensions.sar import Polarization, SarExtension
 from pystac.extensions.sat import OrbitState, SatExtension
 from pystac.extensions.eo import EOExtension
@@ -162,6 +163,11 @@ def on_cloud_cover(product: Mapping[str, Any], value: Any, target_item: Item):
     target_item.ext.eo.cloud_cover = float(value)
 
 
+def on_slice_number(product: Mapping[str, Any], value: Any, target_item: Item):
+    s1_extension = Sentinel1Extension.ext(target_item, add_if_missing=True)
+    s1_extension.slice_number = value
+
+
 DISPATCH_REGISTRY: Dict[str, Handler] = {
     "beginningDateTime": on_beginning_datetime,
     "endingDateTime": on_ending_datetime,
@@ -181,6 +187,7 @@ DISPATCH_REGISTRY: Dict[str, Handler] = {
     "platformShortName": on_platform_short_name,
     "instrumentShortName": on_instrument_short_name,
     "cloudCover": on_cloud_cover,
+    "sliceNumber": on_slice_number,
 }
 
 # Convert
