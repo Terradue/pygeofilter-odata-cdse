@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pygeocdse"
+name = "pygeofilter-odata-cdse"
 dynamic = ["version"]
 description = ''
 readme = "README.md"
@@ -52,6 +52,9 @@ odata-client = "pygeocdse.cli:main"
 
 [tool.hatch.version]
 path = "src/pygeocdse/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pygeocdse"]
 
 [tool.hatch.envs.types]
 extra-dependencies = [
