@@ -29,13 +29,13 @@ dependencies = [
   "geojson==3.2.0",
   "pystac @ git+https://github.com/Terradue/pystac.git@t2_extensions",
   "click==8.3.1",
-  "pygeofilter==0.3.1",
-  "ipykernel==6.31.0",
+  "pygeofilter==0.3.3",
+  "ipykernel==7.2.0",
   "shapely==2.1.2",
-  "nose2==0.15.1",
+  "nose2==0.16.0",
   "loguru==0.7.3",
-  "requests==2.32.5",
-  "lxml==4.8.0",
+  "requests==2.33.1",
+  "lxml==6.0.2",
   "pygml==0.3.2"
 ]
 
