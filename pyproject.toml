@@ -35,7 +35,7 @@ dependencies = [
   "nose2==0.16.0",
   "loguru==0.7.3",
   "requests==2.33.1",
-  "lxml==6.0.2",
+  "lxml==6.1.0",
   "pygml==0.3.2"
 ]
 
