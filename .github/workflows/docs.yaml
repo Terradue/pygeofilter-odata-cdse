@@ -16,9 +16,9 @@ name: docs
 on:
   push:
     branches:
+      - docs
       - develop
       - main
-      - master
     paths:
       # Only rebuild website when docs have changed
       - 'README.md'
