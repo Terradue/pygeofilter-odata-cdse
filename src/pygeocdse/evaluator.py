@@ -114,10 +114,11 @@ class CDSEEvaluator(Evaluator):
     @handle(ast.In)
     def in_(self, node, lhs, *options):
         attr_type = get_attribute_type(node.lhs.name)
-        mapper = lambda rhs: (
-            f"Attributes/OData.CSC.{attr_type}Attribute/any(att:att/Name eq {lhs} and att/OData.CSC.{attr_type}Attribute/Value eq {rhs})"
-        )
-        return "(" + " or ".join(map(mapper, options)) + ")"
+
+        def _mapper(rhs):
+            return f"Attributes/OData.CSC.{attr_type}Attribute/any(att:att/Name eq {lhs} and att/OData.CSC.{attr_type}Attribute/Value eq {rhs})"
+
+        return "(" + " or ".join(map(_mapper, options)) + ")"
 
     @handle(ast.IsNull)
     def null(self, node, lhs):
