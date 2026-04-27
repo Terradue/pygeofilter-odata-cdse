@@ -317,9 +317,7 @@ def http_invoke(
         http_client.build_request = _log_request(http_client.build_request)  # type: ignore
         http_client.request = _log_response(http_client.request)  # type: ignore
         response: Response = http_client.get(
-            url=url,
-            headers={"Prefer": f"odata.maxpagesize={limit}"},
-            timeout=30
+            url=url, headers={"Prefer": f"odata.maxpagesize={limit}"}, timeout=30
         )
 
     response.raise_for_status()  # Raise an error for HTTP error codes
