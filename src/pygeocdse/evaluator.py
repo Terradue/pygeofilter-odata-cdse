@@ -14,6 +14,9 @@
 
 from builtins import isinstance
 from datetime import date, datetime, timedelta
+from functools import wraps
+from http import HTTPStatus
+from httpx import Client, Headers, Request, RequestNotRead, Response
 from loguru import logger
 from pygeocdse.odata_attributes import get_attribute_type
 from pygeofilter import ast, values
@@ -22,7 +25,7 @@ from pygeofilter.parsers.cql2_json import parse as json_parse
 from pygeofilter.util import IdempotentDict, parse_datetime
 from typing import Any, Dict, Mapping, Optional
 import json
-import requests
+import re
 import shapely
 
 COMPARISON_OP_MAP = {
@@ -231,6 +234,76 @@ def to_cdse_where(
     return CDSEEvaluator(field_mapping, function_map or {}).evaluate(root)
 
 
+def _decode(value):
+    if not value:
+        return ""
+
+    if isinstance(value, str):
+        return value
+
+    return value.decode("utf-8")
+
+
+def _log_request(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        request: Request = func(*args, **kwargs)
+
+        logger.warning(f"{request.method} {request.url}")
+
+        headers: Headers = request.headers
+        for name, value in headers.raw:
+            header_value = re.sub(
+                r"(\bBearer\s+)[^\s]+",
+                r"\1********",
+                _decode(value),
+                flags=re.IGNORECASE,
+            )
+            logger.warning(f"> {_decode(name)}: {header_value}")
+
+        logger.warning(">")
+        try:
+            if request.content:
+                logger.warning(_decode(request.content))
+        except RequestNotRead:
+            logger.warning("[REQUEST BUILT FROM STREAM, OMISSING]")
+
+        return request
+
+    return wrapper
+
+
+def _log_response(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        response: Response = func(*args, **kwargs)
+
+        if HTTPStatus.MULTIPLE_CHOICES._value_ <= response.status_code:
+            log = logger.error
+        else:
+            log = logger.success
+
+        status: HTTPStatus = HTTPStatus(response.status_code)
+        log(f"< {status._value_} {status.phrase}")
+
+        headers: Mapping[str, str] = response.headers
+        for name, value in headers.items():
+            log(f"< {_decode(name)}: {_decode(value)}")
+
+        log("")
+
+        if response.content:
+            log(_decode(response.content))
+
+        if HTTPStatus.MULTIPLE_CHOICES._value_ <= response.status_code:
+            raise RuntimeError(
+                f"A server error occurred when invoking {kwargs['method'].upper()} {kwargs['url']}, read the logs for details"
+            )
+        return response
+
+    return wrapper
+
+
 def http_invoke(
     base_url: str,
     cql2_filter: str | Dict[str, Any],
@@ -240,9 +313,15 @@ def http_invoke(
     current_filter: str = to_cdse(cql2_filter)
     url: str = f"{base_url}?$filter={current_filter}&$top={max_items}&$expand=Assets&$expand=Attributes&$expand=Locations"
 
-    logger.debug(f"Invoking {url}...")
+    with Client() as http_client:
+        http_client.build_request = _log_request(http_client.build_request)  # type: ignore
+        http_client.request = _log_response(http_client.request)  # type: ignore
+        response: Response = http_client.get(
+            url=url,
+            headers={"Prefer": f"odata.maxpagesize={limit}"},
+            timeout=30
+        )
 
-    response = requests.get(url=url, headers={"Prefer": f"odata.maxpagesize={limit}"})
     response.raise_for_status()  # Raise an error for HTTP error codes
     data = response.json()
 
