@@ -34,7 +34,7 @@ Note: the value of `L1xv70IW` is certainly different
 To run the tests
 
 ```
-hatch run default:test
+hatch run dev:test --verbose
 ```
 
 ## Container Image Strategy & Availability

@@ -31,7 +31,7 @@ jobs:
       run: hatch build
     - name: Test
       run: |
-        hatch -e default run nose2 --verbose
+        hatch run dev:test --verbose
   # ------------------------------------------------------------
   # Resolve release tag from ref
   # ------------------------------------------------------------
@@ -86,7 +86,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y jq skopeo
-          curl -sL https://github.com/oras-project/oras/releases/download/v1.2.2/oras_1.2.2_linux_amd64.tar.gz | tar -xz oras
+          curl -sL https://github.com/oras-project/oras/releases/download/v1.3.2/oras_1.3.2_linux_amd64.tar.gz | tar -xz oras
           sudo mv oras /usr/local/bin/oras
 
       - name: Configure Docker Hub auth for Kaniko
@@ -105,7 +105,7 @@ jobs:
           fi
 
       - name: Build image with Kaniko (to tar)
-        uses: docker://gcr.io/kaniko-project/executor:debug
+        uses: docker://gcr.io/kaniko-project/executor:v1.24.0-debug
         env:
           DOCKER_CONFIG: /github/home/.docker
         with:
@@ -119,7 +119,7 @@ jobs:
       # Trivy scan (relaxed for now)
       # --------------------------------------------------------
       - name: Trivy scan (debug mode)
-        uses: docker://aquasec/trivy:0.50.2
+        uses: docker://aquasec/trivy:0.70.0
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db
         with:
@@ -131,7 +131,7 @@ jobs:
             --no-progress
 
       - name: Generate SBOM (SPDX JSON)
-        uses: docker://aquasec/trivy:0.50.2
+        uses: docker://aquasec/trivy:0.70.0
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db
         with:

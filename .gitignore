@@ -179,3 +179,4 @@ cython_debug/
 .vscode/settings.json
 test/a/b/c/item_collection.json
 .codex
+.task
