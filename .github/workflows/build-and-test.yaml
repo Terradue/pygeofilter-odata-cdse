@@ -44,4 +44,4 @@ jobs:
       run: hatch build
     - name: Test
       run: |
-        hatch -e default run nose2 --verbose
+        hatch run dev:test --verbose
