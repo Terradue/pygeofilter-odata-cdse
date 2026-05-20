@@ -49,7 +49,9 @@ class TestCDSEIntegration(unittest.TestCase):
         }
 
         data = http_invoke(
-            "https://catalogue.dataspace.copernicus.eu/odata/v1/Products", cql2_filter
+            base_url="https://catalogue.dataspace.copernicus.eu/odata/v1/Products",
+            cql2_filter=cql2_filter,
+            timeout=60,
         )
 
         self.assertIsNotNone(data, "Expected JSON data")
@@ -134,7 +136,9 @@ class TestCDSEIntegration(unittest.TestCase):
         }
 
         data = http_invoke(
-            "https://catalogue.dataspace.copernicus.eu/odata/v1/Products", cql2_filter
+            base_url="https://catalogue.dataspace.copernicus.eu/odata/v1/Products",
+            cql2_filter=cql2_filter,
+            timeout=60,
         )
 
         self.assertIsNotNone(data, "Expected JSON data")

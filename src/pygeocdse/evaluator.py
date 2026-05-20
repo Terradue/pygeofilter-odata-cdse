@@ -310,6 +310,7 @@ def http_invoke(
     cql2_filter: str | Dict[str, Any],
     limit: int = 20,
     max_items: int = 200,
+    timeout: int = 30,
 ) -> Mapping[str, Any]:
     current_filter: str = to_cdse(cql2_filter)
     url: str = f"{base_url}?$filter={current_filter}&$top={max_items}&$expand=Assets&$expand=Attributes&$expand=Locations"
@@ -318,7 +319,7 @@ def http_invoke(
         http_client.build_request = _log_request(http_client.build_request)  # type: ignore
         http_client.request = _log_response(http_client.request)  # type: ignore
         response: Response = http_client.get(
-            url=url, headers={"Prefer": f"odata.maxpagesize={limit}"}, timeout=30
+            url=url, headers={"Prefer": f"odata.maxpagesize={limit}"}, timeout=timeout
         )
 
     response.raise_for_status()  # Raise an error for HTTP error codes
