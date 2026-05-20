@@ -280,7 +280,7 @@ def odata_products_to_stac_item_collection(
         item.add_link(
             Link(
                 rel=RelType.DERIVED_FROM,
-                target=f"{url}?$filter=Name%20eq%20%27{product.get('Name')}%27&$expand=Assets&$expand=Attributes#OData.CSC.StringAttribute",
+                target=f"{url}?$filter=Name%20eq%20%27{product.get('Name')}%27&$expand=Assets&$expand=Attributes",
                 media_type="application/json",
                 title="OData product entry",
             )
