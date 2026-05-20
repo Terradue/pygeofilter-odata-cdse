@@ -139,6 +139,13 @@ class FilterLang(Enum):
     required=False,
     help="Filename to save GeoJSON FeatureCollection to",
 )
+@click.option(
+    "--timeout",
+    type=click.INT,
+    required=True,
+    default=30,
+    help="Connection timeout, in seconds",
+)
 def search_cmd(
     url: str,
     collections: List[str] | None,
@@ -155,6 +162,7 @@ def search_cmd(
     max_items: int,
     method: HttpMethod | None,
     save: Path | None,
+    timeout: int,
 ):
     try:
         ast: AstType | None = None
@@ -179,7 +187,11 @@ def search_cmd(
 
         cql2_json_str = to_cql2(ast)
         result: Mapping[str, Any] = http_invoke(
-            base_url=url, cql2_filter=cql2_json_str, limit=limit, max_items=max_items
+            base_url=url,
+            cql2_filter=cql2_json_str,
+            limit=limit,
+            max_items=max_items,
+            timeout=timeout,
         )
 
         if save:
