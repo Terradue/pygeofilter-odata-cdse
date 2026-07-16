@@ -39,7 +39,7 @@ dependencies = [
 allow-direct-references = true
 
 [project.urls]
-Documentation = "https://github.com/Terradue/pygeofilter-odata-cdse#readme"
+Documentation = "https://terradue.github.io/pygeofilter-odata-cdse/"
 Issues = "https://github.com/Terradue/pygeofilter-odata-cdse/issues"
 Source = "https://github.com/Terradue/pygeofilter-odata-cdse"
 
