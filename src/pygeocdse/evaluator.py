@@ -12,21 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import isinstance
+import json
+import re
+from collections.abc import Mapping
 from datetime import date, datetime, timedelta
 from functools import wraps
 from http import HTTPStatus
+from typing import Any
+
+import shapely
 from httpx import Client, Headers, Request, RequestNotRead, Response
 from loguru import logger
-from pygeocdse.odata_attributes import get_attribute_type
 from pygeofilter import ast, values
 from pygeofilter.backends.evaluator import Evaluator, handle
 from pygeofilter.parsers.cql2_json import parse as json_parse
 from pygeofilter.util import IdempotentDict, parse_datetime
-from typing import Any, Dict, Mapping, Optional
-import json
-import re
-import shapely
+
+from pygeocdse.odata_attributes import get_attribute_type
 
 COMPARISON_OP_MAP = {
     ast.ComparisonOp.EQ: "eq",
@@ -73,7 +75,7 @@ class CDSEEvaluator(Evaluator):
 
     @handle(ast.Comparison, subclasses=True)
     def comparison(self, node, lhs, rhs):
-        if "Collection/Name" == node.lhs.name:
+        if node.lhs.name == "Collection/Name":
             return f"{node.lhs.name} {COMPARISON_OP_MAP.get(node.op)} {rhs}"
 
         if "Date" in lhs:
@@ -177,10 +179,9 @@ class CDSEEvaluator(Evaluator):
 
         if isinstance(node.start, timedelta):
             return values.Interval(node.end - node.start, node.end)
-        elif isinstance(node.end, timedelta):
+        if isinstance(node.end, timedelta):
             return values.Interval(node.start, node.start + node.end)
-        else:
-            return node
+        return node
 
     """
     Spatial comparison handling
@@ -214,23 +215,20 @@ class CDSEEvaluator(Evaluator):
     def literal(self, node):
         if isinstance(node, str):
             return f"'{node}'"
-        elif (isinstance(node, date) or isinstance(node, datetime)) and not isinstance(
-            node, timedelta
-        ):
+        if isinstance(node, (date, datetime)) and not isinstance(node, timedelta):
             return date_format(node)
-        else:
-            # TODO:
-            return str(node)
+        # TODO:
+        return str(node)
 
 
-def to_cdse(cql2_filter: str | Dict[str, Any]) -> str:
+def to_cdse(cql2_filter: str | dict[str, Any]) -> str:
     return to_cdse_where(json_parse(cql2_filter), IdempotentDict())
 
 
 def to_cdse_where(
     root: ast.AstType,
     field_mapping: Mapping[str, str],
-    function_map: Optional[Mapping[str, str]] = None,
+    function_map: Mapping[str, str] | None = None,
 ) -> str:
     return CDSEEvaluator(field_mapping, function_map or {}).evaluate(root)
 
@@ -307,7 +305,7 @@ def _log_response(func):
 
 def http_invoke(
     base_url: str,
-    cql2_filter: str | Dict[str, Any],
+    cql2_filter: str | dict[str, Any],
     limit: int = 20,
     max_items: int = 200,
     timeout: int = 30,
@@ -323,6 +321,4 @@ def http_invoke(
         )
 
     response.raise_for_status()  # Raise an error for HTTP error codes
-    data = response.json()
-
-    return data
+    return response.json()

@@ -14,7 +14,6 @@
 
 import unittest
 
-
 from pygeocdse.evaluator import to_cdse
 
 

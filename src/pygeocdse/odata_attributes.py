@@ -17,7 +17,6 @@ from pygeocdse.sentinel2 import SENTINEL2
 from pygeocdse.sentinel3 import SENTINEL3
 from pygeocdse.sentinel5p import SENTINEL5P
 
-
 # TODO: import all attributes from all satellites
 # see https://documentation.dataspace.copernicus.eu/APIs/OData.html#list-of-odata-query-attributes-by-collection
 # GLOBAL-MOSAICS

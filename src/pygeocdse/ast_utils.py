@@ -15,6 +15,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+
 from pygeofilter.ast import (
     And,
     AstType,
@@ -27,7 +29,9 @@ from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
 from pygeofilter.util import parse_datetime
 from pygeofilter.values import Geometry
 from shapely.geometry import box, mapping
-from typing import Sequence, Tuple
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def _and_concat(left: AstType | None, right: AstType) -> AstType:
@@ -96,7 +100,9 @@ def collections_filter(filter: AstType | None, collections: Sequence[str]) -> As
     return _and_concat(filter, expr)
 
 
-def bbox_filter(filter: AstType | None, bbox: Tuple[float]) -> AstType:
+def bbox_filter(
+    filter: AstType | None, bbox: tuple[float, float, float, float]
+) -> AstType:
     geometry = box(*bbox)
 
     geometry_filter = GeometryIntersects(
@@ -106,8 +112,8 @@ def bbox_filter(filter: AstType | None, bbox: Tuple[float]) -> AstType:
     return _and_concat(filter, geometry_filter)
 
 
-def _as_utc(datetime: str) -> datetime:
-    dt: datetime = parse_datetime(datetime)
+def _as_utc(value: str) -> datetime:
+    dt: datetime = parse_datetime(value)
     # pygeofilter.util.parse_datetime may return naive or tz-aware dt depending on input
     if dt.tzinfo is None:
         return dt.replace(tzinfo=timezone.utc)

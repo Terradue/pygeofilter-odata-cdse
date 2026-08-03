@@ -154,3 +154,7 @@ typecheck = "mypy --install-types --non-interactive {args:src}"
 lint = "ruff format {args:src tests}"
 check = "ruff check --fix {args:src tests}"
 security = "bandit -r {args:src}"
+
+[[tool.mypy.overrides]]
+module = ["geojson.*", "pygeofilter.*"]
+ignore_missing_imports = true
