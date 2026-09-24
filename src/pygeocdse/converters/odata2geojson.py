@@ -16,11 +16,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Mapping, TextIO, Optional
+from typing import TYPE_CHECKING, Any, TextIO
+
 import geojson
 
+if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping
 
-def _parse_rfc3339(dt: Optional[str]) -> Optional[str]:
+
+def _parse_rfc3339(dt: str | None) -> str | None:
     """Normalize timestamps like '2025-01-28T15:50:03.000000Z' to RFC3339."""
     if not dt:
         return None
@@ -29,15 +33,14 @@ def _parse_rfc3339(dt: Optional[str]) -> Optional[str]:
     return datetime.fromisoformat(dt).isoformat()
 
 
-def _bbox_from_geojson_geometry(geom: Dict[str, Any]) -> List[float]:
+def _bbox_from_geojson_geometry(geom: dict[str, Any]) -> list[float]:
     """Compute [minx, miny, maxx, maxy] from Polygon/MultiPolygon GeoJSON geometry."""
     gtype = geom.get("type")
     coords = geom.get("coordinates")
 
     def iter_points_polygon(poly_coords):
         for ring in poly_coords:
-            for x, y in ring:
-                yield x, y
+            yield from ring
 
     def iter_points_multipolygon(mpoly_coords):
         for poly in mpoly_coords:
@@ -55,7 +58,7 @@ def _bbox_from_geojson_geometry(geom: Dict[str, Any]) -> List[float]:
     return [min(xs), min(ys), max(xs), max(ys)]
 
 
-def _to_geojson_instance(obj: Dict[str, Any]) -> Any:
+def _to_geojson_instance(obj: dict[str, Any]) -> Any:
     """
     Convert a plain dict (already shaped like GeoJSON) into a geojson.* object.
     geojson.dumps/loads are wrappers around json that return geojson objects. :contentReference[oaicite:2]{index=2}
@@ -65,14 +68,17 @@ def _to_geojson_instance(obj: Dict[str, Any]) -> Any:
 
 @dataclass(frozen=True)
 class FeatureBuildOptions:
-    feature_id_getter: Callable[[Dict[str, Any]], Any] = lambda p: p.get("Id")
+    feature_id_getter: Callable[[dict[str, Any]], Any] = lambda p: p.get("Id")
     include_bbox: bool = True
-    property_filter: Optional[Callable[[str, Any], bool]] = None
+    property_filter: Callable[[str, Any], bool] | None = None
+
+
+DEFAULT_FEATURE_BUILD_OPTIONS = FeatureBuildOptions()
 
 
 def odata_products_to_feature_collection_geojson(
     odata: Mapping[str, Any],
-    opts: FeatureBuildOptions = FeatureBuildOptions(),
+    opts: FeatureBuildOptions = DEFAULT_FEATURE_BUILD_OPTIONS,
 ) -> geojson.FeatureCollection:
     """
     Convert an OData Products response into a geojson.FeatureCollection.
@@ -83,8 +89,8 @@ def odata_products_to_feature_collection_geojson(
       - properties: curated OData fields
       - bbox: optional per Feature bbox (and optional top-level bbox)
     """
-    products: List[Dict[str, Any]] = list(odata.get("value") or [])
-    features: List[geojson.Feature] = []
+    products: list[dict[str, Any]] = list(odata.get("value") or [])
+    features: list[geojson.Feature] = []
 
     # Optional top-level bbox
     minx = miny = float("inf")
@@ -153,7 +159,7 @@ def odata_products_to_feature_collection_geojson(
 def to_feature_collection_geojson(
     odata: Mapping[str, Any],
     output_stream: TextIO,
-    opts: FeatureBuildOptions = FeatureBuildOptions(),
+    opts: FeatureBuildOptions = DEFAULT_FEATURE_BUILD_OPTIONS,
 ):
     feature_collection = odata_products_to_feature_collection_geojson(odata, opts)
     output_stream.write(geojson.dumps(feature_collection, indent=2))

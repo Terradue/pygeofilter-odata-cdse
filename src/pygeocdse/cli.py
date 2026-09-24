@@ -14,23 +14,29 @@
 
 from __future__ import annotations
 
-from enum import auto, Enum
-from loguru import logger
+import sys
+from enum import Enum, auto
 from pathlib import Path
-from pygeocdse.evaluator import http_invoke
+from typing import TYPE_CHECKING, Any
+
+import click
+from loguru import logger
+from pygeofilter.backends.cql2_json import to_cql2
+from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
+from pygeofilter.parsers.ecql import parse as parse_ecql
+
 from pygeocdse.ast_utils import (
     bbox_filter,
     collections_filter,
     datetime_or_interval_filter,
 )
 from pygeocdse.converters.odata2stac import to_stac_item_collection
-from pygeofilter.ast import AstType
-from pygeofilter.backends.cql2_json import to_cql2
-from pygeofilter.parsers.ecql import parse as parse_ecql
-from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
-from typing import Any, List, Mapping, Tuple
-import click
-import sys
+from pygeocdse.evaluator import http_invoke
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from pygeofilter.ast import AstType
 
 
 @click.group(
@@ -148,16 +154,16 @@ class FilterLang(Enum):
 )
 def search_cmd(
     url: str,
-    collections: List[str] | None,
-    ids: List[str] | None,
-    bbox: Tuple[float, ...] | None,
+    collections: list[str] | None,
+    ids: list[str] | None,
+    bbox: tuple[float, float, float, float] | None,
     intersects: str | None,
     datetime: str | None,
     query: str | None,
     filter: str | None,
     filter_lang: str | None,
-    sortby: List[str] | None,
-    fields: List[str] | None,
+    sortby: list[str] | None,
+    fields: list[str] | None,
     limit: int,
     max_items: int,
     method: HttpMethod | None,

@@ -180,3 +180,4 @@ cython_debug/
 test/a/b/c/item_collection.json
 .codex
 .task
+uv.lock

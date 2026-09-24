@@ -14,18 +14,21 @@
 
 from __future__ import annotations
 
+import json
 from datetime import datetime
+from typing import TYPE_CHECKING, Any, Protocol, TextIO
+
 from loguru import logger
 from pystac import Asset, Item, ItemCollection, Link, RelType
+from pystac.extensions.eo import EOExtension
 from pystac.extensions.processing import ProcessingExtension
 from pystac.extensions.product import ProductExtension
-from pystac.extensions.sentinel1 import Sentinel1Extension
 from pystac.extensions.sar import Polarization, SarExtension
 from pystac.extensions.sat import OrbitState, SatExtension
-from pystac.extensions.eo import EOExtension
-from typing import Any, Dict, List, Mapping, Protocol, TextIO
+from pystac.extensions.sentinel1 import Sentinel1Extension
 
-import json
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 LEVEL_MAP = {
     "LEVEL1": "L1",
@@ -168,7 +171,7 @@ def on_slice_number(product: Mapping[str, Any], value: Any, target_item: Item):
     s1_extension.slice_number = value
 
 
-DISPATCH_REGISTRY: Dict[str, Handler] = {
+DISPATCH_REGISTRY: dict[str, Handler] = {
     "beginningDateTime": on_beginning_datetime,
     "endingDateTime": on_ending_datetime,
     "orbitNumber": on_orbit_number,
@@ -193,7 +196,19 @@ DISPATCH_REGISTRY: Dict[str, Handler] = {
 # Convert
 
 
-def _bbox_from_geojson_geometry(geom: Dict[str, Any]) -> List[float]:
+def _apply_attributes(product: Mapping[str, Any], item: Item) -> None:
+    for attribute in product.get("Attributes") or []:
+        name = str(attribute.get("Name"))
+        value = attribute.get("Value")
+        if name in DISPATCH_REGISTRY:
+            DISPATCH_REGISTRY[name](product, value, item)
+        elif name != "platformSerialIdentifier":
+            logger.warning(
+                f"Attribute '{name}' not yet managed by the STAC spec or extensions."
+            )
+
+
+def _bbox_from_geojson_geometry(geom: dict[str, Any]) -> list[float]:
     """
     Compute [minx, miny, maxx, maxy] from a GeoJSON geometry.
     Supports Polygon and MultiPolygon.
@@ -203,8 +218,7 @@ def _bbox_from_geojson_geometry(geom: Dict[str, Any]) -> List[float]:
 
     def iter_points_polygon(poly_coords):
         for ring in poly_coords:
-            for x, y in ring:
-                yield x, y
+            yield from ring
 
     def iter_points_multipolygon(mpoly_coords):
         for poly in mpoly_coords:
@@ -231,11 +245,11 @@ def odata_products_to_stac_item_collection(
     Expected input shape:
       { "value": [ {product}, ... ], "@odata.nextLink": ... }
     """
-    products: List[Dict[str, Any]] = list(odata.get("value") or [])
+    products: list[dict[str, Any]] = list(odata.get("value") or [])
 
     logger.debug(f"Processing {len(products)} Product(s).")
 
-    items: List[Item] = []
+    items: list[Item] = []
 
     for i, product in enumerate(products):
         logger.debug(
@@ -329,20 +343,7 @@ def odata_products_to_stac_item_collection(
             )
             item.add_asset("Product", zip_asset)
 
-        # Add all extra fields
-        attributes = product.get("Attributes") or []
-        for attribute in attributes:
-            name: str = str(attribute.get("Name"))
-            value: Any = attribute.get("Value")
-            if name in DISPATCH_REGISTRY:
-                DISPATCH_REGISTRY[name](product, value, item)
-            elif name in ["platformSerialIdentifier"]:
-                # Handled in on_platform_short_name
-                continue
-            else:
-                logger.warning(
-                    f"Attribute '{name}' not yet managed by the STAC spec or extensions."
-                )
+        _apply_attributes(product, item)
 
         logger.debug(f"Appending STAC Item '{item.id}")
 

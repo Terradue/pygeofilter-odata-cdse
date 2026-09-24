@@ -69,4 +69,4 @@ The image tag is derived automatically from the Git reference that triggered the
 
 ## License
 
-`pygeocdse` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+[![Apache License, Version 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
