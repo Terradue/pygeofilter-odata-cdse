@@ -3,6 +3,8 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/pygeocdse.svg)](https://pypi.org/project/pygeocdse)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pygeocdse.svg)](https://pypi.org/project/pygeocdse)
 
+[![Project Status](https://img.shields.io/github/actions/workflow/status/:user/:repo/:workflow)](https://img.shields.io/github/actions/workflow/status/:user/:repo/:workflow)
+
 -----
 
 ## Table of Contents
