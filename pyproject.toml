@@ -28,7 +28,7 @@ classifiers = [
 dependencies = [
   "geojson==3.3.0",
   "pystac @ git+https://github.com/Terradue/pystac.git@t2_extensions",
-  "click==8.3.1",
+  "click==8.5.0",
   "pygeofilter==0.4.0",
   "shapely==2.1.2",
   "loguru==0.7.3",
