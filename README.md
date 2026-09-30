@@ -1,74 +1,40 @@
 # pygeofilter-odata-cdse
 
-[![PyPI - Version](https://img.shields.io/pypi/v/pygeocdse.svg)](https://pypi.org/project/pygeocdse)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pygeocdse.svg)](https://pypi.org/project/pygeocdse)
+Translate CQL2 JSON filters into Copernicus Data Space Ecosystem (CDSE) OData queries, search the Products catalogue, and convert responses to STAC or GeoJSON.
 
-[![Project Status](https://img.shields.io/github/actions/workflow/status/:user/:repo/:workflow)](https://img.shields.io/github/actions/workflow/status/:user/:repo/:workflow)
-
------
-
-## Table of Contents
-
-- [Installation](#installation)
-- [License](#license)
+Requires Python 3.10 or later. The distribution name is `pygeofilter-odata-cdse`; the Python import name is `pygeocdse`.
 
 ## Installation
 
 ```console
-pip install pygeocdse
+python -m pip install pygeofilter-odata-cdse
 ```
 
-## For developers
+Installing the current source requires Git because its dependencies include a PySTAC fork hosted on GitHub.
 
-### Python environment
+## Documentation
 
-Use `hatch shell` to create a Python environment.
+Read the [documentation website](https://terradue.github.io/pygeofilter-odata-cdse/) or browse the sources:
 
-This environment is created in your HOME and the python path is ~:
-```
-/home/<user>/.local/share/hatch/env/virtual/pygeocdse/L1xv70IW/pygeocdse/bin/python
-```
+- **Tutorial:** [Translate your first filter](docs/tutorials/first-filter.md).
+- **How-to guides:** [Search the catalogue](docs/how-to/search.md), [convert responses](docs/how-to/convert.md), and [develop and build documentation](docs/how-to/develop.md).
+- **Reference:** [Python API](docs/reference/api.md), [operators](docs/reference/operators.md), [attributes](docs/attributes.md), [CLI](docs/cli.md), and [OData–STAC crosswalk](docs/odata-stac-crosswalk.md).
+- **Explanation:** [How translation and conversion work](docs/explanation/architecture.md).
 
-Note: the value of `L1xv70IW` is certainly different
+The implementation supports a subset of CQL2 for CDSE. See the reference for current behavior and limitations.
 
-### Run the tests
+## Container images
 
-To run the tests
+The container workflow targets `ghcr.io/terradue/pygeofilter-odata-cdse`:
 
-```
-hatch run dev:test --verbose
-```
+| Git reference | Image tag |
+| --- | --- |
+| `develop` | `latest-dev` |
+| `main` | `latest` |
+| `vX.Y.Z` | `X.Y.Z` |
 
-## Container Image Strategy & Availability
-
-This project publishes container images to GitHub Container Registry (GHCR) following a clear and deterministic tagging strategy aligned with the Git branching and release model.
-
-### Image Registry
-
-Images are published to:
-
-```
-ghcr.io/<repository-owner>/pygeofilter-odata-cdse
-```
-
-See https://github.com/orgs/Terradue/packages/container/package/pygeofilter-odata-cdse
-
-The registry owner corresponds to the GitHub repository owner (user or organization).
-
-Images are built using Kaniko and pushed using OCI-compliant tooling.
-
-### Tagging Strategy
-
-The image tag is derived automatically from the Git reference that triggered the build:
-
-
-| Git reference    | Image tag    | Purpose                            |
-| ---------------- | ------------ | ---------------------------------- |
-| `develop` branch | `latest-dev` | Development and integration builds |
-| `main` branch    | `latest`     | Stable branch builds               |
-| Git tag `vX.Y.Z` | `X.Y.Z`      | Immutable release builds           |
-
+See [container build details and current limitations](docs/reference/containers.md).
 
 ## License
 
-[![Apache License, Version 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
+Licensed under the [Apache License, Version 2.0](LICENSE).

@@ -1,10 +1,12 @@
 # CDSE OData → STAC crosswalk
 
+This reference describes `pygeocdse.converters.odata2stac`. See [how to convert responses](how-to/convert.md) for usage. Products without footprints are skipped; retained products require a `beginningDateTime` attribute. Polygon and MultiPolygon footprints are supported. Unmapped attributes are logged and omitted, and OData pagination links are not copied.
+
 ## Attribute fields
 
  attribute                                  | STAC (core / extension) | STAC field / property                                | Transformation applied                                                                                                                                                                    |
 | ------------------------------------------------ | ----------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `OriginDate` *(product top-level field)*         | **STAC Core**           | `datetime`                                           | Parsed RFC3339 timestamp via `_parse_rfc3339`, assigned to `Item.datetime`.                                                                                                               |
+| `beginningDateTime` *(attribute)*         | **STAC Core**           | `datetime`                                           | Parsed RFC3339 timestamp via `_parse_rfc3339`, assigned to `Item.datetime`.                                                                                                               |
 | `GeoFootprint` *(product top-level field)*       | **STAC Core**           | `geometry`                                           | GeoJSON geometry copied as-is to `Item.geometry`.                                                                                                                                         |
 | `GeoFootprint` *(product top-level field)*       | **STAC Core**           | `bbox`                                               | Bounding box computed from GeoJSON geometry (`Polygon` / `MultiPolygon`) using `_bbox_from_geojson_geometry`.                                                                             |
 | `Id` *(product top-level field)*                 | **STAC Core**           | `id`                                                 | Converted to string and assigned to `Item.id`.                                                                                                                                            |
@@ -41,5 +43,9 @@ These are not from Attributes, but from OData Locations / Checksum:
 | `Locations[].FormatType`                 | **STAC Core**                 | `assets[<key>]` and `asset.title`            | Uses `FormatType` as the asset key and as title.                                                                                                                     |
 | `Locations[].ContentLength`              | **file** *(via extra_fields)* | `asset.extra_fields["file:size"]`            | Stores size as extra field.                                                                                                                                          |
 | `Locations[].Checksum[]`                 | *(custom extra_fields)*       | `asset.extra_fields["checksum:<Algorithm>"]` | For each checksum, creates an extra field key namespaced by algorithm.                                                                                               |
-| `Id`                                     | **STAC Core**                 | `assets["Product"]`                          | Adds ZIP asset: `href=https://download.dataspace.copernicus.eu/odata/v1/Products(<Id>)/$value`, media_type `application/zip`, roles `["data","metadata","archive"]`. |
+| `Id` *(when no Locations)*               | **STAC Core**                 | `assets["Product"]`                          | Adds ZIP asset: `href=https://download.dataspace.copernicus.eu/odata/v1/Products(<Id>)/$value`, media_type `application/zip`, roles `["data","metadata","archive"]`. |
 | `S3Path` *(if present and no Locations)* | **STAC Core**                 | `assets["data"]`                             | Adds guessed asset with `href=S3Path`, media_type from ContentType, extra fields size/checksum.                                                                      |
+
+## Sentinel-1 slice metadata
+
+`sliceNumber` is mapped through `Sentinel1Extension.slice_number` to `s1:slice_number`.
