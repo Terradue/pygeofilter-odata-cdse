@@ -34,7 +34,7 @@ ADDITIONAL_ATTRIBUTES = ["Collection/Name", "PublicationDate", "ModificationDate
 ALL_ATTRIBUTES = [SENTINEL1, SENTINEL2, SENTINEL3, SENTINEL5P]
 
 
-def get_attribute_type(attribute_name):
+def get_attribute_type(attribute_name: str) -> str:
     if attribute_name in ADDITIONAL_ATTRIBUTES:
         return ""
 

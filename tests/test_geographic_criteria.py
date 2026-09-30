@@ -19,10 +19,10 @@ from pygeocdse.evaluator import to_cdse
 
 # see https://documentation.dataspace.copernicus.eu/APIs/OData.html#query-by-geographic-criteria
 class TestGeographicCriteria(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         pass
 
-    def test_search_polygon(self):
+    def test_search_polygon(self) -> None:
         # To search for products intersecting the specified polygon
         cql2_filter = {
             "op": "s_intersects",
@@ -47,7 +47,7 @@ class TestGeographicCriteria(unittest.TestCase):
 
         self.assertEqual(expected, to_cdse(cql2_filter))
 
-    def test_search_point(self):
+    def test_search_point(self) -> None:
         # To search for products intersecting the specified point
         cql2_filter = {
             "op": "s_intersects",

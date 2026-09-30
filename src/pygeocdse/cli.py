@@ -17,7 +17,7 @@ from __future__ import annotations
 import sys
 from enum import Enum, auto
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import click
 from loguru import logger
@@ -36,13 +36,11 @@ from pygeocdse.evaluator import http_invoke
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from pygeofilter.ast import AstType
+    from pygeofilter.ast import AstType, Node
 
 
-@click.group(
-    context_settings={"show_default": True, "help_option_names": ["-h", "--help"]}
-)
-def main():
+@click.group(context_settings={"show_default": True, "help_option_names": ["-h", "--help"]})
+def main() -> None:
     """OData client CLI."""
     pass
 
@@ -55,6 +53,35 @@ class HttpMethod(Enum):
 class FilterLang(Enum):
     CQL2_JSON = "cql2-json"
     CQL2_TEXT = "cql2-text"
+
+
+def _build_filter(
+    filter: str | None,
+    filter_lang: str | None,
+    collections: list[str] | None,
+    bbox: tuple[float, float, float, float] | None,
+    datetime: str | None,
+) -> AstType:
+    ast: AstType | None = None
+
+    if filter:
+        if FilterLang.CQL2_JSON.value == filter_lang:
+            ast = parse_cql2_json(filter)
+        else:
+            ast = parse_ecql(filter)  # type: ignore[no-untyped-call]  # Upstream parser.
+
+    if collections:
+        ast = collections_filter(ast, collections)
+    if bbox:
+        ast = bbox_filter(ast, bbox)
+    if datetime:
+        ast = datetime_or_interval_filter(ast, datetime)
+
+    if ast is None:
+        raise Exception(
+            "At least one of the --filter|--collections|--bbox|--datetime option must be set."
+        )
+    return ast
 
 
 @main.command("search")
@@ -112,9 +139,7 @@ class FilterLang(Enum):
     ),
     default=FilterLang.CQL2_JSON.value,
 )
-@click.option(
-    "--sortby", help="Sort by fields", type=click.STRING, required=False, multiple=True
-)
+@click.option("--sortby", help="Sort by fields", type=click.STRING, required=False, multiple=True)
 @click.option(
     "--fields",
     help="Control what fields get returned",
@@ -122,9 +147,7 @@ class FilterLang(Enum):
     required=False,
     multiple=True,
 )
-@click.option(
-    "--limit", help="Page size limit", required=False, type=click.INT, default=20
-)
+@click.option("--limit", help="Page size limit", required=False, type=click.INT, default=20)
 @click.option(
     "--max-items",
     help="Max items to retrieve from search",
@@ -152,7 +175,8 @@ class FilterLang(Enum):
     default=30,
     help="Connection timeout, in seconds",
 )
-def search_cmd(
+def search_cmd(  # noqa: PLR0913 -- Click supplies one keyword argument per option.
+    *,
     url: str,
     collections: list[str] | None,
     ids: list[str] | None,
@@ -169,29 +193,11 @@ def search_cmd(
     method: HttpMethod | None,
     save: Path | None,
     timeout: int,
-):
+) -> None:
     try:
-        ast: AstType | None = None
+        ast = _build_filter(filter, filter_lang, collections, bbox, datetime)
 
-        if filter:
-            if FilterLang.CQL2_JSON.value == filter_lang:
-                ast = parse_cql2_json(filter)
-            else:
-                ast = parse_ecql(filter)  # type: ignore
-
-        if collections:
-            ast = collections_filter(ast, collections)
-        if bbox:
-            ast = bbox_filter(ast, bbox)
-        if datetime:
-            ast = datetime_or_interval_filter(ast, datetime)
-
-        if ast is None:
-            raise Exception(
-                "At least one of the --filter|--collections|--bbox|--datetime option must be set."
-            )
-
-        cql2_json_str = to_cql2(ast)
+        cql2_json_str = to_cql2(cast("Node", ast))
         result: Mapping[str, Any] = http_invoke(
             base_url=url,
             cql2_filter=cql2_json_str,
@@ -211,13 +217,9 @@ def search_cmd(
             to_stac_item_collection(url, result, sys.stdout)
             logger.success("Results successfully converted to STAC Item Collection.")
 
-        logger.info(
-            "------------------------------------------------------------------------"
-        )
+        logger.info("------------------------------------------------------------------------")
         logger.success("BUILD SUCCESS")
     except Exception as e:
-        logger.info(
-            "------------------------------------------------------------------------"
-        )
+        logger.info("------------------------------------------------------------------------")
         logger.error("BUILD FAILED")
         logger.error(f"An unexpected error occurred: {e}")
