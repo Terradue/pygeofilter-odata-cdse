@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" />
+      <link rel="shortcut icon" href="/pygeofilter-odata-cdse/img/favicon.ico" />
+    <title>pygeofilter CDSE OData support for CQL2</title>
+    <link rel="stylesheet" href="/pygeofilter-odata-cdse/css/theme.css" />
+    <link rel="stylesheet" href="/pygeofilter-odata-cdse/css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+    <!--[if lt IE 9]>
+      <script src="/pygeofilter-odata-cdse/js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="/pygeofilter-odata-cdse/.">
+          <img src="/pygeofilter-odata-cdse/imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="/pygeofilter-odata-cdse//search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/.">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/tutorials/first-filter/">Translate your first filter</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/how-to/search/">Search the catalogue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/how-to/convert/">Convert responses</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/how-to/develop/">Develop and preview documentation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/reference/api/">Python API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/reference/operators/">Operators</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/attributes/">Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/cli/">CLI</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/odata-stac-crosswalk/">OData-STAC crosswalk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/reference/containers/">Container builds</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Example notebooks</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="/pygeofilter-odata-cdse/catalogue-search/">pygeofilter CDSE OData support for CQL2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="/pygeofilter-odata-cdse/logical_comparison_op/">Supported Comparison operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="/pygeofilter-odata-cdse/geographical_op/">Spatial operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="/pygeofilter-odata-cdse/temporal_op/">Temporal operators</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/pygeofilter-odata-cdse/explanation/architecture/">Translation and conversion</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="/pygeofilter-odata-cdse/.">pygeofilter CDSE OData support for CQL2</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="/pygeofilter-odata-cdse/." class="icon icon-home" aria-label="Docs"></a></li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+  <h1 id="404-page-not-found">404</h1>
+
+  <p><strong>Page not found</strong></p>
+
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse" class="fa fa-code-fork" style="color: #fcfcfc"> Terradue/pygeofilter-odata-cdse</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="/pygeofilter-odata-cdse/js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "/pygeofilter-odata-cdse/";</script>
+    <script src="/pygeofilter-odata-cdse/js/theme_extra.js"></script>
+    <script src="/pygeofilter-odata-cdse/js/theme.js"></script>
+      <script src="/pygeofilter-odata-cdse/search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

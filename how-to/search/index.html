@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://terradue.github.io/pygeofilter-odata-cdse/how-to/search/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Search the catalogue - pygeofilter CDSE OData support for CQL2</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Search the catalogue";
+        var mkdocs_page_input_path = "how-to/search.md";
+        var mkdocs_page_url = "/pygeofilter-odata-cdse/how-to/search/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tutorials/first-filter/">Translate your first filter</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Search the catalogue</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#search-from-python">Search from Python</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-collection-area-and-time-constraints">Add collection, area, and time constraints</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#search-from-the-command-line">Search from the command line</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../convert/">Convert responses</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../develop/">Develop and preview documentation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/api/">Python API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/operators/">Operators</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../attributes/">Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cli/">CLI</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../odata-stac-crosswalk/">OData-STAC crosswalk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/containers/">Container builds</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Example notebooks</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../catalogue-search/">pygeofilter CDSE OData support for CQL2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../logical_comparison_op/">Supported Comparison operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../geographical_op/">Spatial operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../temporal_op/">Temporal operators</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../explanation/architecture/">Translation and conversion</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">pygeofilter CDSE OData support for CQL2</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">How-to guides</li>
+      <li class="breadcrumb-item active">Search the catalogue</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse/edit/master/docs/how-to/search.md">Edit on Terradue/pygeofilter-odata-cdse</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="search-the-cdse-catalogue">Search the CDSE catalogue</h1>
+<p>Use this guide when you have installed the package and want to retrieve products. See the <a href="../../tutorials/first-filter/">tutorial</a> for installation and a first translation exercise.</p>
+<h2 id="search-from-python">Search from Python</h2>
+<p>Pass a CQL2 JSON dictionary and the Products endpoint to <code>http_invoke</code>:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><span class="kn">from</span><span class="w"> </span><span class="nn">pygeocdse.evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="n">http_invoke</span>
+</span><span id="__span-0-2">
+</span><span id="__span-0-3"><span class="n">url</span> <span class="o">=</span> <span class="s2">"https://catalogue.dataspace.copernicus.eu/odata/v1/Products"</span>
+</span><span id="__span-0-4"><span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-0-5">    <span class="s2">"op"</span><span class="p">:</span> <span class="s2">"and"</span><span class="p">,</span>
+</span><span id="__span-0-6">    <span class="s2">"args"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-0-7">        <span class="p">{</span><span class="s2">"op"</span><span class="p">:</span> <span class="s2">"="</span><span class="p">,</span> <span class="s2">"args"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"property"</span><span class="p">:</span> <span class="s2">"Collection/Name"</span><span class="p">},</span> <span class="s2">"SENTINEL-2"</span><span class="p">]},</span>
+</span><span id="__span-0-8">        <span class="p">{</span><span class="s2">"op"</span><span class="p">:</span> <span class="s2">"&lt;="</span><span class="p">,</span> <span class="s2">"args"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"property"</span><span class="p">:</span> <span class="s2">"cloudCover"</span><span class="p">},</span> <span class="mi">20</span><span class="p">]},</span>
+</span><span id="__span-0-9">    <span class="p">],</span>
+</span><span id="__span-0-10"><span class="p">}</span>
+</span><span id="__span-0-11"><span class="n">response</span> <span class="o">=</span> <span class="n">http_invoke</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+</span><span id="__span-0-12"><span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"value"</span><span class="p">,</span> <span class="p">[]):</span>
+</span><span id="__span-0-13">    <span class="nb">print</span><span class="p">(</span><span class="n">product</span><span class="p">[</span><span class="s2">"Id"</span><span class="p">],</span> <span class="n">product</span><span class="p">[</span><span class="s2">"Name"</span><span class="p">])</span>
+</span></code></pre></div>
+<p>The returned mapping is the raw OData response. <code>limit</code> sets a page-size preference and <code>max_items</code> sets <code>$top</code>; the helper makes one GET request and does not follow <code>@odata.nextLink</code>. Retain that field if your application needs to request subsequent pages.</p>
+<h2 id="add-collection-area-and-time-constraints">Add collection, area, and time constraints</h2>
+<p>Use the AST helpers to combine constraints, then serialize back to CQL2 JSON:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><span class="kn">from</span><span class="w"> </span><span class="nn">pygeofilter.backends.cql2_json</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_cql2</span>
+</span><span id="__span-1-2"><span class="kn">from</span><span class="w"> </span><span class="nn">pygeocdse.ast_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-1-3">    <span class="n">bbox_filter</span><span class="p">,</span>
+</span><span id="__span-1-4">    <span class="n">collections_filter</span><span class="p">,</span>
+</span><span id="__span-1-5">    <span class="n">datetime_or_interval_filter</span><span class="p">,</span>
+</span><span id="__span-1-6"><span class="p">)</span>
+</span><span id="__span-1-7"><span class="kn">from</span><span class="w"> </span><span class="nn">pygeocdse.evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_cdse</span>
+</span><span id="__span-1-8">
+</span><span id="__span-1-9"><span class="n">ast</span> <span class="o">=</span> <span class="n">collections_filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="s2">"SENTINEL-2"</span><span class="p">])</span>
+</span><span id="__span-1-10"><span class="n">ast</span> <span class="o">=</span> <span class="n">bbox_filter</span><span class="p">(</span><span class="n">ast</span><span class="p">,</span> <span class="p">(</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">))</span>
+</span><span id="__span-1-11"><span class="n">ast</span> <span class="o">=</span> <span class="n">datetime_or_interval_filter</span><span class="p">(</span>
+</span><span id="__span-1-12">    <span class="n">ast</span><span class="p">,</span> <span class="s2">"2023-02-01T00:00:00Z/2023-02-28T23:59:59Z"</span>
+</span><span id="__span-1-13"><span class="p">)</span>
+</span><span id="__span-1-14"><span class="n">query</span> <span class="o">=</span> <span class="n">to_cql2</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span>
+</span><span id="__span-1-15"><span class="nb">print</span><span class="p">(</span><span class="n">to_cdse</span><span class="p">(</span><span class="n">query</span><span class="p">))</span>
+</span></code></pre></div>
+<p>Send <code>query</code> with <code>http_invoke</code> as above. Bounding-box coordinates are minimum longitude, minimum latitude, maximum longitude, maximum latitude. The interval requires product start at or after its lower bound and product end at or before its upper bound. A single date/time instead sets a lower bound on product start. Use explicit UTC timestamps ending in <code>Z</code>.</p>
+<h2 id="search-from-the-command-line">Search from the command line</h2>
+<p>Use the <code>odata-client</code> command installed with the package:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><span class="go">odata-client search \</span>
+</span><span id="__span-2-2"><span class="go">  --collections SENTINEL-2 \</span>
+</span><span id="__span-2-3"><span class="go">  --bbox 12 40 15 43 \</span>
+</span><span id="__span-2-4"><span class="go">  --datetime 2023-02-01T00:00:00Z/2023-02-28T23:59:59Z \</span>
+</span><span id="__span-2-5"><span class="go">  --limit 10 --max-items 10 \</span>
+</span><span id="__span-2-6"><span class="go">  --save items.json \</span>
+</span><span id="__span-2-7"><span class="go">  https://catalogue.dataspace.copernicus.eu/odata/v1/Products</span>
+</span></code></pre></div>
+<p>This writes a STAC ItemCollection to <code>items.json</code>, creating parent directories as needed. Omit <code>--save</code> to write JSON to standard output. See <a href="../../cli/">CLI reference</a> for implemented options and limitations, and <a href="../convert/">conversion requirements</a> if conversion fails.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../tutorials/first-filter/" class="btn btn-neutral float-left" title="Translate your first filter"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../convert/" class="btn btn-neutral float-right" title="Convert responses">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse" class="fa fa-code-fork" style="color: #fcfcfc"> Terradue/pygeofilter-odata-cdse</a>
+        </span>
+    
+    
+      <span><a href="../../tutorials/first-filter/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../convert/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

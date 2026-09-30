@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://terradue.github.io/pygeofilter-odata-cdse/reference/containers/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Container builds - pygeofilter CDSE OData support for CQL2</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Container builds";
+        var mkdocs_page_input_path = "reference/containers.md";
+        var mkdocs_page_url = "/pygeofilter-odata-cdse/reference/containers/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tutorials/first-filter/">Translate your first filter</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/search/">Search the catalogue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/convert/">Convert responses</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/develop/">Develop and preview documentation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../api/">Python API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operators/">Operators</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../attributes/">Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cli/">CLI</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../odata-stac-crosswalk/">OData-STAC crosswalk</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Container builds</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#current-build-limitations">Current build limitations</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Example notebooks</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../catalogue-search/">pygeofilter CDSE OData support for CQL2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../logical_comparison_op/">Supported Comparison operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../geographical_op/">Spatial operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../temporal_op/">Temporal operators</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../explanation/architecture/">Translation and conversion</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">pygeofilter CDSE OData support for CQL2</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Reference</li>
+      <li class="breadcrumb-item active">Container builds</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse/edit/master/docs/reference/containers.md">Edit on Terradue/pygeofilter-odata-cdse</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="container-build-reference">Container build reference</h1>
+<p>The repository container workflow uses Kaniko to build an image archive and Skopeo to publish it to <code>ghcr.io/&lt;repository-owner&gt;/pygeofilter-odata-cdse</code> (owner and repository names are lowercased).</p>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>develop</code> branch</td>
+<td><code>latest-dev</code></td>
+</tr>
+<tr>
+<td><code>main</code> branch</td>
+<td><code>latest</code></td>
+</tr>
+<tr>
+<td>Git tag <code>vX.Y.Z</code></td>
+<td><code>X.Y.Z</code>, checked against the package version</td>
+</tr>
+</tbody>
+</table>
+<p>Published artifacts, when available, are listed in the <a href="https://github.com/orgs/Terradue/packages/container/package/pygeofilter-odata-cdse">Terradue container package</a>.</p>
+<p>The Dockerfile builds a wheel with Hatch, installs it in a Rocky Linux runtime image, and runs as user <code>neo</code> (UID/GID 2000). It does not define an application entrypoint.</p>
+<h2 id="current-build-limitations">Current build limitations</h2>
+<p>The Dockerfile checks the installed CLI with <code>odata-client --help</code>. The container workflow invokes <code>hatch run dev:test</code>, while the current Hatch development environment has no <code>test</code> script. This configuration mismatch can prevent new images from being published. The tag table describes the configured strategy, not a guarantee that any particular tag is available.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../odata-stac-crosswalk/" class="btn btn-neutral float-left" title="OData-STAC crosswalk"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../catalogue-search/" class="btn btn-neutral float-right" title="pygeofilter CDSE OData support for CQL2">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse" class="fa fa-code-fork" style="color: #fcfcfc"> Terradue/pygeofilter-odata-cdse</a>
+        </span>
+    
+    
+      <span><a href="../../odata-stac-crosswalk/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../catalogue-search/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

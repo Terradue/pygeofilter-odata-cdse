@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://terradue.github.io/pygeofilter-odata-cdse/reference/api/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Python API - pygeofilter CDSE OData support for CQL2</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Python API";
+        var mkdocs_page_input_path = "reference/api.md";
+        var mkdocs_page_url = "/pygeofilter-odata-cdse/reference/api/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tutorials/first-filter/">Translate your first filter</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/search/">Search the catalogue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/convert/">Convert responses</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/develop/">Develop and preview documentation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Python API</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#filter-translation-pygeocdseevaluator">Filter translation: pygeocdse.evaluator</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ast-helpers-pygeocdseast_utils">AST helpers: pygeocdse.ast_utils</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#stac-conversion-pygeocdseconvertersodata2stac">STAC conversion: pygeocdse.converters.odata2stac</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#geojson-conversion-pygeocdseconvertersodata2geojson">GeoJSON conversion: pygeocdse.converters.odata2geojson</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operators/">Operators</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../attributes/">Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cli/">CLI</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../odata-stac-crosswalk/">OData-STAC crosswalk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../containers/">Container builds</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Example notebooks</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../catalogue-search/">pygeofilter CDSE OData support for CQL2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../logical_comparison_op/">Supported Comparison operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../geographical_op/">Spatial operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../temporal_op/">Temporal operators</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../explanation/architecture/">Translation and conversion</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">pygeofilter CDSE OData support for CQL2</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Reference</li>
+      <li class="breadcrumb-item active">Python API</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse/edit/master/docs/reference/api.md">Edit on Terradue/pygeofilter-odata-cdse</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="python-api-reference">Python API reference</h1>
+<p>The import namespace is <code>pygeocdse</code>. CQL2 JSON inputs may be Python dictionaries or JSON strings unless otherwise stated.</p>
+<h2 id="filter-translation-pygeocdseevaluator">Filter translation: <code>pygeocdse.evaluator</code></h2>
+<table>
+<thead>
+<tr>
+<th>Callable</th>
+<th>Result and behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>to_cdse(cql2_filter)</code></td>
+<td>Returns an OData filter string using identity field mapping. Parses CQL2 JSON; does not send a request.</td>
+</tr>
+<tr>
+<td><code>to_cdse_where(root, field_mapping, function_map=None)</code></td>
+<td>Evaluates a pygeofilter AST and returns a string. <code>field_mapping</code> maps attribute names; <code>function_map</code> maps function names and defaults to an empty mapping.</td>
+</tr>
+<tr>
+<td><code>CDSEEvaluator(attribute_map, function_map)</code></td>
+<td>AST evaluator used by both translation functions.</td>
+</tr>
+<tr>
+<td><code>http_invoke(base_url, cql2_filter, limit=20, max_items=200, timeout=30)</code></td>
+<td>Returns the decoded OData response mapping from one GET request.</td>
+</tr>
+</tbody>
+</table>
+<p><code>http_invoke</code> appends <code>$filter</code>, <code>$top=max_items</code>, and expansions for <code>Assets</code>, <code>Attributes</code>, and <code>Locations</code>. It sends <code>Prefer: odata.maxpagesize=&lt;limit&gt;</code> and passes <code>timeout</code> in seconds to HTTPX. Supply a Products endpoint without an existing query string. It calls <code>raise_for_status()</code> and does not follow pagination links. HTTPX connection, timeout, status, and JSON decoding errors can propagate.</p>
+<p>Unknown query attributes raise <code>ValueError</code>. Missing field/function mappings can raise <code>KeyError</code>. A custom field mapping does not replace the built-in type registry: comparison type lookup uses the original attribute name. See <a href="../operators/">operators</a> and <a href="../../attributes/">attributes</a>.</p>
+<h2 id="ast-helpers-pygeocdseast_utils">AST helpers: <code>pygeocdse.ast_utils</code></h2>
+<p>Each helper accepts an existing AST or <code>None</code>, returns an AST, and combines new constraints with an existing filter using AND.</p>
+<table>
+<thead>
+<tr>
+<th>Signature</th>
+<th>Constraint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>collections_filter(filter, collections)</code></td>
+<td>OR of <code>Collection/Name</code> equalities. Strips names and discards blanks; raises <code>ValueError</code> when none remain.</td>
+</tr>
+<tr>
+<td><code>bbox_filter(filter, bbox)</code></td>
+<td>Spatial intersection with a box <code>(min_lon, min_lat, max_lon, max_lat)</code>.</td>
+</tr>
+<tr>
+<td><code>datetime_or_interval_filter(filter, datetime)</code></td>
+<td>Single value: <code>ContentDate/Start &gt;= value</code>. Closed <code>start/end</code>: start &gt;= lower bound AND end &lt;= upper bound.</td>
+</tr>
+</tbody>
+</table>
+<p>Empty datetime strings and missing interval endpoints raise <code>ValueError</code>. Open-ended intervals are not supported by this helper.</p>
+<h2 id="stac-conversion-pygeocdseconvertersodata2stac">STAC conversion: <code>pygeocdse.converters.odata2stac</code></h2>
+<table>
+<thead>
+<tr>
+<th>Signature</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>odata_products_to_stac_item_collection(url, odata)</code></td>
+<td><code>pystac.ItemCollection</code></td>
+</tr>
+<tr>
+<td><code>to_stac_item_collection(url, odata, output_stream)</code></td>
+<td><code>None</code>; writes indented JSON to a text stream</td>
+</tr>
+</tbody>
+</table>
+<p><code>odata</code> is a response mapping with a <code>value</code> array. <code>url</code> is used in derived-from links. No pagination link is copied. Products without footprints are skipped; unsupported footprint geometry types and missing <code>beginningDateTime</code> raise <code>ValueError</code>. Mapping handlers can also raise on missing companion attributes or invalid enum values. See the <a href="../../odata-stac-crosswalk/">STAC crosswalk</a>.</p>
+<h2 id="geojson-conversion-pygeocdseconvertersodata2geojson">GeoJSON conversion: <code>pygeocdse.converters.odata2geojson</code></h2>
+<table>
+<thead>
+<tr>
+<th>Signature</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>odata_products_to_feature_collection_geojson(odata, opts=DEFAULT_FEATURE_BUILD_OPTIONS)</code></td>
+<td><code>geojson.FeatureCollection</code></td>
+</tr>
+<tr>
+<td><code>to_feature_collection_geojson(odata, output_stream, opts=DEFAULT_FEATURE_BUILD_OPTIONS)</code></td>
+<td><code>None</code>; writes indented JSON to a text stream</td>
+</tr>
+</tbody>
+</table>
+<p><code>FeatureBuildOptions</code> is a frozen dataclass:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>feature_id_getter</code></td>
+<td>Function returning product <code>Id</code></td>
+<td>Callable receiving a product dictionary</td>
+</tr>
+<tr>
+<td><code>include_bbox</code></td>
+<td><code>True</code></td>
+<td>Include per-feature and aggregate bounding boxes; supports Polygon/MultiPolygon</td>
+</tr>
+<tr>
+<td><code>property_filter</code></td>
+<td><code>None</code></td>
+<td>Optional <code>(name, value) -&gt; bool</code> callable selecting properties</td>
+</tr>
+</tbody>
+</table>
+<p>Properties are <code>id</code>, <code>name</code>, <code>content_start</code>, <code>content_end</code>, <code>origin_date</code>, <code>publication_date</code>, <code>modification_date</code>, <code>online</code>, <code>s3_path</code>, <code>content_type</code>, <code>content_length</code>, and <code>checksum</code>. Values equal to <code>None</code> are omitted. Dates are parsed with <code>datetime.fromisoformat</code> and serialized with <code>isoformat</code>. Products without geometry are skipped. A response <code>@odata.nextLink</code> becomes the top-level non-standard <code>next</code> member.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../how-to/develop/" class="btn btn-neutral float-left" title="Develop and preview documentation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../operators/" class="btn btn-neutral float-right" title="Operators">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse" class="fa fa-code-fork" style="color: #fcfcfc"> Terradue/pygeofilter-odata-cdse</a>
+        </span>
+    
+    
+      <span><a href="../../how-to/develop/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../operators/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

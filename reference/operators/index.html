@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://terradue.github.io/pygeofilter-odata-cdse/reference/operators/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Operators - pygeofilter CDSE OData support for CQL2</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Operators";
+        var mkdocs_page_input_path = "reference/operators.md";
+        var mkdocs_page_url = "/pygeofilter-odata-cdse/reference/operators/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tutorials/first-filter/">Translate your first filter</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/search/">Search the catalogue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/convert/">Convert responses</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/develop/">Develop and preview documentation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../api/">Python API</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Operators</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#logical-and-comparison-operators">Logical and comparison operators</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#spatial-operator">Spatial operator</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#temporal-operators">Temporal operators</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#additional-evaluator-handlers">Additional evaluator handlers</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../attributes/">Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cli/">CLI</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../odata-stac-crosswalk/">OData-STAC crosswalk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../containers/">Container builds</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Example notebooks</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../catalogue-search/">pygeofilter CDSE OData support for CQL2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../logical_comparison_op/">Supported Comparison operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../geographical_op/">Spatial operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../temporal_op/">Temporal operators</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../explanation/architecture/">Translation and conversion</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">pygeofilter CDSE OData support for CQL2</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Reference</li>
+      <li class="breadcrumb-item active">Operators</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse/edit/master/docs/reference/operators.md">Edit on Terradue/pygeofilter-odata-cdse</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="operator-reference">Operator reference</h1>
+<p>This page describes the CDSE evaluator, not full CQL2 or OData conformance. The examples use CQL2 JSON property references such as <code>{"property": "cloudCover"}</code>.</p>
+<h2 id="logical-and-comparison-operators">Logical and comparison operators</h2>
+<table>
+<thead>
+<tr>
+<th>CQL2 JSON operator</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>and</code></td>
+<td>Joins clauses with <code>and</code></td>
+</tr>
+<tr>
+<td><code>or</code></td>
+<td>Parenthesized clauses joined with <code>or</code></td>
+</tr>
+<tr>
+<td><code>not</code></td>
+<td>Prefixes the evaluated clause with <code>NOT</code></td>
+</tr>
+<tr>
+<td><code>=</code>, <code>eq</code></td>
+<td><code>eq</code></td>
+</tr>
+<tr>
+<td><code>&lt;&gt;</code>, <code>ne</code></td>
+<td><code>ne</code></td>
+</tr>
+<tr>
+<td><code>&lt;</code>, <code>lt</code></td>
+<td><code>lt</code></td>
+</tr>
+<tr>
+<td><code>&lt;=</code>, <code>lte</code></td>
+<td><code>le</code></td>
+</tr>
+<tr>
+<td><code>&gt;</code>, <code>gt</code></td>
+<td><code>gt</code></td>
+</tr>
+<tr>
+<td><code>&gt;=</code>, <code>gte</code></td>
+<td><code>ge</code></td>
+</tr>
+<tr>
+<td><code>in</code></td>
+<td>Parenthesized OR of typed attribute equality predicates</td>
+</tr>
+</tbody>
+</table>
+<p>Comparisons expect a property on the left. <code>Collection/Name</code> comparisons address the product field directly. Other comparisons look up a type in the <a href="../../attributes/">attribute registry</a> and generate <code>Attributes/OData.CSC.&lt;Type&gt;Attribute/any(...)</code>. For multiple collections, use OR of equalities rather than <code>in</code>.</p>
+<p>See the <a href="../../logical_comparison_op/">comparison examples notebook</a>.</p>
+<h2 id="spatial-operator">Spatial operator</h2>
+<p><code>s_intersects</code> emits <code>OData.CSC.Intersects(area=geography'SRID=4326;&lt;WKT&gt;')</code>. Its geometry argument is GeoJSON converted to WKT using Shapely; coordinates are longitude/latitude. The left-hand property is conventionally <code>geometry</code>; the output does not use its name. No other spatial predicate has a dedicated handler.</p>
+<p>See the <a href="../../geographical_op/">spatial example notebook</a>.</p>
+<h2 id="temporal-operators">Temporal operators</h2>
+<p>Use temporal predicates for <code>ContentDate/Start</code>, <code>ContentDate/End</code>, or <code>PublicationDate</code>. Bounds below describe timestamp-string and interval inputs.</p>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Timestamp</th>
+<th>Interval <code>[start, end]</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>t_after</code></td>
+<td><code>&gt; timestamp</code></td>
+<td><code>&gt; start AND &lt;= end</code></td>
+</tr>
+<tr>
+<td><code>t_before</code></td>
+<td><code>&lt; timestamp</code></td>
+<td><code>&gt;= start AND &lt; end</code></td>
+</tr>
+<tr>
+<td><code>t_begins</code></td>
+<td><code>&gt;= timestamp</code></td>
+<td><code>&gt;= start AND &lt;= end</code></td>
+</tr>
+<tr>
+<td><code>t_ends</code></td>
+<td><code>&lt;= timestamp</code></td>
+<td><code>&gt;= start AND &lt;= end</code></td>
+</tr>
+</tbody>
+</table>
+<p>Timestamps are formatted to second precision with a trailing <code>Z</code>. Supply UTC timestamps; formatting does not itself normalize timezone offsets. An interval can contain one ISO 8601 duration: <code>[start, duration]</code> adds it to the start, and <code>[duration, end]</code> subtracts it from the end. Two durations raise <code>ValueError</code>.</p>
+<p>See the <a href="../../temporal_op/">temporal examples notebook</a>.</p>
+<h2 id="additional-evaluator-handlers">Additional evaluator handlers</h2>
+<p>The evaluator also contains handlers for <code>Between</code>, <code>Like</code>, <code>IsNull</code>, arithmetic, and mapped functions. These are implementation facilities, not a guarantee that their output is accepted by CDSE. In particular, <code>Like</code> and <code>IsNull</code> emit SQL-style syntax, and <code>Between</code> emits direct field comparisons rather than typed attribute predicates. Function calls require an explicit <code>function_map</code> through <code>to_cdse_where</code>.</p>
+<p>String literals are surrounded with single quotes without escaping embedded quotes. Boolean literals use Python string formatting. Account for these limits when choosing filter values; successful translation alone does not validate a query against the remote catalogue.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../api/" class="btn btn-neutral float-left" title="Python API"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../attributes/" class="btn btn-neutral float-right" title="Attributes">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse" class="fa fa-code-fork" style="color: #fcfcfc"> Terradue/pygeofilter-odata-cdse</a>
+        </span>
+    
+    
+      <span><a href="../api/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../attributes/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

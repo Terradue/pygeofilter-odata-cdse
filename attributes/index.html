@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://terradue.github.io/pygeofilter-odata-cdse/attributes/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Attributes - pygeofilter CDSE OData support for CQL2</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Attributes";
+        var mkdocs_page_input_path = "attributes.md";
+        var mkdocs_page_url = "/pygeofilter-odata-cdse/attributes/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="..">
+          <img src="../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../tutorials/first-filter/">Translate your first filter</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/search/">Search the catalogue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/convert/">Convert responses</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../how-to/develop/">Develop and preview documentation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/api/">Python API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/operators/">Operators</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Attributes</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#sentinel-1">Sentinel-1</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sentinel-1-rtc">Sentinel-1-RTC</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sentinel-2">Sentinel-2</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sentinel-3">Sentinel-3</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sentinel-5p">Sentinel-5P</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#additional-attributes">Additional Attributes</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../odata-stac-crosswalk/">OData-STAC crosswalk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reference/containers/">Container builds</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Example notebooks</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../catalogue-search/">pygeofilter CDSE OData support for CQL2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../logical_comparison_op/">Supported Comparison operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geographical_op/">Spatial operators</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../temporal_op/">Temporal operators</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../explanation/architecture/">Translation and conversion</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">pygeofilter CDSE OData support for CQL2</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Reference</li>
+      <li class="breadcrumb-item active">Attributes</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse/edit/master/docs/attributes.md">Edit on Terradue/pygeofilter-odata-cdse</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="supported-attributes">Supported attributes</h1>
+<p>These tables describe the attribute dictionaries shipped with the library. Type lookup checks Sentinel-1, Sentinel-2, Sentinel-3, then Sentinel-5P and returns the first matching type, regardless of the selected collection. Unknown attributes raise <code>ValueError</code>.</p>
+<p><code>Collection/Name</code>, <code>PublicationDate</code>, and <code>ModificationDate</code> are additionally recognized by the registry. Use temporal predicates for product date fields; see the <a href="../reference/operators/">operator reference</a>.</p>
+<h2 id="sentinel-1">Sentinel-1</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>productType</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>origin</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>datatakeID</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>timeliness</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>coordinates</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>cycleNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>orbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>sliceNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>totalSlices</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>productClass</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processorName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>orbitDirection</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingDate</code></td>
+<td><code>DateTimeOffset</code></td>
+</tr>
+<tr>
+<td><code>operationalMode</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingLevel</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>swathIdentifier</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingCenter</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processorVersion</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>segmentStartTime</code></td>
+<td><code>DateTimeOffset</code></td>
+</tr>
+<tr>
+<td><code>sliceProductFlag</code></td>
+<td><code>Boolean</code></td>
+</tr>
+<tr>
+<td><code>platformShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>productGeneration</code></td>
+<td><code>DateTimeOffset</code></td>
+</tr>
+<tr>
+<td><code>processingBaseline</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>productComposition</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>instrumentShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>relativeOrbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>polarisationChannels</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>productConsolidation</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>platformSerialIdentifier</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>instrumentConfigurationID</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>startTimeFromAscendingNode</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>completionTimeFromAscendingNode</code></td>
+<td><code>Double</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="sentinel-1-rtc">Sentinel-1-RTC</h2>
+<p>This dictionary exists in the source but is not included in <code>ALL_ATTRIBUTES</code>. RTC-only names, such as <code>authority</code> and <code>spatialResolution</code>, are not recognized unless present in another registered dictionary.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>productType</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>authority</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>orbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>orbitDirection</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>operationalMode</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingLevel</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>platformShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>spatialResolution</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>instrumentShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>relativeOrbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>polarisationChannels</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>platformSerialIdentifier</code></td>
+<td><code>String</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="sentinel-2">Sentinel-2</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>productType</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>origin</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>tileId</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>cloudCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>coordinates</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>datastripId</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>orbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>qualityInfo</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>qualityStatus</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>sourceProduct</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingDate</code></td>
+<td><code>DateTimeOffset</code></td>
+</tr>
+<tr>
+<td><code>productGroupId</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>lastOrbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>operationalMode</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingLevel</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingCenter</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processorVersion</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>granuleIdentifier</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>platformShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingBaseline</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>instrumentShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>relativeOrbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>illuminationZenithAngle</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>sourceProductOriginDate</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>platformSerialIdentifier</code></td>
+<td><code>String</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="sentinel-3">Sentinel-3</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>productType</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>landCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>cloudCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>timeliness</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>brightCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>coordinates</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>cycleNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>orbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>coastalCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>processorName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>closedSeaCover</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>openOceanCover</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>orbitDirection</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingDate</code></td>
+<td><code>DateTimeOffset</code></td>
+</tr>
+<tr>
+<td><code>snowOrIceCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>lastOrbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>operationalMode</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingLevel</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingCenter</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processorVersion</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>salineWaterCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>tidalRegionCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>platformShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>baselineCollection</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>lastOrbitDirection</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingBaseline</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>continentalIceCover</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>instrumentShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>relativeOrbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>freshInlandWaterCover</code></td>
+<td><code>Double</code></td>
+</tr>
+<tr>
+<td><code>lastRelativeOrbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>platformSerialIdentifier</code></td>
+<td><code>String</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="sentinel-5p">Sentinel-5P</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>productType</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>doi</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>identifier</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>coordinates</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>orbitNumber</code></td>
+<td><code>Integer</code></td>
+</tr>
+<tr>
+<td><code>productClass</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processorName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>qualityStatus</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingDate</code></td>
+<td><code>DateTimeOffset</code></td>
+</tr>
+<tr>
+<td><code>processingMode</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>acquisitionType</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingLevel</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>parentIdentifier</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingCenter</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processorVersion</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>platformShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>baselineCollection</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>processingBaseline</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>instrumentShortName</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>platformSerialIdentifier</code></td>
+<td><code>String</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="additional-attributes">Additional Attributes</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Collection/Name</code></td>
+<td><code>String</code></td>
+</tr>
+<tr>
+<td><code>PublicationDate</code></td>
+<td><code>DateTimeOffset</code></td>
+</tr>
+<tr>
+<td><code>ModificationDate</code></td>
+<td><code>DateTimeOffset</code></td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../reference/operators/" class="btn btn-neutral float-left" title="Operators"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../cli/" class="btn btn-neutral float-right" title="CLI">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Terradue/pygeofilter-odata-cdse" class="fa fa-code-fork" style="color: #fcfcfc"> Terradue/pygeofilter-odata-cdse</a>
+        </span>
+    
+    
+      <span><a href="../reference/operators/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../cli/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
