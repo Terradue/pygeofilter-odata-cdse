@@ -71,7 +71,7 @@ allow-direct-references = true
 Documentation = "https://terradue.github.io/pygeofilter-odata-cdse/"
 Issues = "https://github.com/Terradue/pygeofilter-odata-cdse/issues"
 Source = "https://github.com/Terradue/pygeofilter-odata-cdse"
-Changelog = "https://github.com/Transpiler-Mate/transpiler-mate-runtime/blob/main/CHANGELOG.md"
+Changelog = "https://github.com/Terradue/pygeofilter-odata-cdse/blob/main/CHANGELOG.md"
 
 [project.scripts]
 odata-client = "pygeocdse.cli:main"
@@ -103,7 +103,7 @@ packages = ["src/pygeocdse"]
 # ---------------------------------------------------------------------------
 
 [tool.coverage.run]
-source_pkgs = ["pygeocdse/runtime", "tests"]
+source_pkgs = ["pygeocdse", "tests"]
 branch = true
 parallel = true
 omit = [
@@ -112,8 +112,8 @@ omit = [
 
 [tool.coverage.paths]
 pygeocdse_api = [
-  "src/pygeocdse/runtime",
-  "*/transpiler-mate-runtime/src/pygeocdse/runtime"
+  "src/pygeocdse",
+  "*/pygeofilter-odata-cdse/src/pygeocdse"
 ]
 
 [tool.coverage.report]
@@ -141,7 +141,7 @@ dependencies = [
 [tool.hatch.envs.test.scripts]
 test = "pytest {args:tests}"
 testv = "pytest --verbose {args:tests}"
-test-cov = "pytest --cov=pygeocdse/runtime --cov-report=term-missing --cov-report=xml:coverage.xml {args:tests}"
+test-cov = "pytest --cov=pygeocdse --cov-report=term-missing --cov-report=xml:coverage.xml {args:tests}"
 test-show-setup = "pytest --setup-show {args:tests}"
 
 [[tool.hatch.envs.test.matrix]]
