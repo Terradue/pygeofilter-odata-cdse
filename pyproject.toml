@@ -19,7 +19,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pygeofilter-odata-cdse"
 dynamic = ["version"]
-description = ''
+description = 'pygeofilter CDSE OData support for CQL2'
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
