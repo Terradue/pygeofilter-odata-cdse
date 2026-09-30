@@ -18,10 +18,10 @@ from pygeocdse.evaluator import http_invoke
 
 
 class TestCDSEIntegration(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         pass
 
-    def test_cdse_invokation(self):
+    def test_cdse_invokation(self) -> None:
         cql2_filter = {
             "op": "and",
             "args": [
@@ -56,7 +56,7 @@ class TestCDSEIntegration(unittest.TestCase):
 
         self.assertIsNotNone(data, "Expected JSON data")
 
-    def test_cdse_invokation_2(self):
+    def test_cdse_invokation_2(self) -> None:
         """
         Collection/Name eq 'SENTINEL-1'
         and (Attributes/OData.CSC.StringAttribute/any(att:att/Name eq 'productType' and att/OData.CSC.StringAttribute/Value eq 'IW_GRHD_1S')

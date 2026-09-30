@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from pygeofilter.ast import (
     And,
@@ -23,6 +23,7 @@ from pygeofilter.ast import (
     Attribute,
     Equal,
     GeometryIntersects,
+    Node,
     Or,
 )
 from pygeofilter.parsers.cql2_json import parse as parse_cql2_json
@@ -68,7 +69,7 @@ def _and_concat(left: AstType | None, right: AstType) -> AstType:
 
     expr = parts[0]
     for p in parts[1:]:
-        expr = And(expr, p)
+        expr = And(cast("Node", expr), cast("Node", p))
 
     return expr
 
@@ -86,28 +87,24 @@ def collections_filter(filter: AstType | None, collections: Sequence[str]) -> As
         raise ValueError("collections_or_ast: `collections` is empty (or only blanks)")
 
     # property reference and "=" nodes
-    prop = Attribute("Collection/Name")
-    terms: list[AstType] = [Equal(prop, c) for c in cols]
+    prop = Attribute("Collection/Name")  # type: ignore[no-untyped-call]  # Upstream constructor.
+    terms: list[Node] = [Equal(prop, c) for c in cols]
 
     if len(terms) == 1:
         return _and_concat(filter, terms[0])
 
     # left-associative OR chain: Or(Or(t1, t2), t3)...
-    expr: AstType = Or(terms[0], terms[1])
+    expr: Node = Or(terms[0], terms[1])
     for t in terms[2:]:
         expr = Or(expr, t)
 
     return _and_concat(filter, expr)
 
 
-def bbox_filter(
-    filter: AstType | None, bbox: tuple[float, float, float, float]
-) -> AstType:
+def bbox_filter(filter: AstType | None, bbox: tuple[float, float, float, float]) -> AstType:
     geometry = box(*bbox)
 
-    geometry_filter = GeometryIntersects(
-        Attribute("geometry"), Geometry(mapping(geometry))
-    )
+    geometry_filter = GeometryIntersects(Attribute("geometry"), Geometry(mapping(geometry)))  # type: ignore[no-untyped-call]
 
     return _and_concat(filter, geometry_filter)
 

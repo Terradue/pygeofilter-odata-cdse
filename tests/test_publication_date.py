@@ -20,14 +20,14 @@ from pygeocdse.evaluator import to_cdse
 # see https://documentation.dataspace.copernicus.eu/APIs/OData.html#query-by-publication-date
 # https://catalogue.dataspace.copernicus.eu/odata/v1/Products?$filter=PublicationDate gt 2019-05-15T00:00:00.000Z and PublicationDate lt 2019-05-16T00:00:00.000Z
 class TestPublicationDate(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         pass
 
     """
     timestamp
     """
 
-    def test_publication_date_exclusive(self):
+    def test_publication_date_exclusive(self) -> None:
         cql2_filter = {
             "op": "and",
             "args": [
@@ -47,10 +47,12 @@ class TestPublicationDate(unittest.TestCase):
                 },
             ],
         }
-        expected = "PublicationDate gt 2023-02-01T00:00:00Z and PublicationDate lt 2023-02-28T23:59:59Z"
+        expected = (
+            "PublicationDate gt 2023-02-01T00:00:00Z and PublicationDate lt 2023-02-28T23:59:59Z"
+        )
         self.assertEqual(expected, to_cdse(cql2_filter))
 
-    def test_publication_date_inclusive(self):
+    def test_publication_date_inclusive(self) -> None:
         cql2_filter = {
             "op": "and",
             "args": [
@@ -70,14 +72,16 @@ class TestPublicationDate(unittest.TestCase):
                 },
             ],
         }
-        expected = "PublicationDate ge 2023-02-01T00:00:00Z and PublicationDate le 2023-02-28T23:59:59Z"
+        expected = (
+            "PublicationDate ge 2023-02-01T00:00:00Z and PublicationDate le 2023-02-28T23:59:59Z"
+        )
         self.assertEqual(expected, to_cdse(cql2_filter))
 
     """
     interval
     """
 
-    def test_publication_date_interval_after(self):
+    def test_publication_date_interval_after(self) -> None:
         cql2_filter = {
             "op": "t_after",
             "args": [
@@ -85,10 +89,12 @@ class TestPublicationDate(unittest.TestCase):
                 {"interval": ["2023-02-01T00:00:00Z", "2023-02-01T23:59:59Z"]},
             ],
         }
-        expected = "PublicationDate gt 2023-02-01T00:00:00Z and PublicationDate le 2023-02-01T23:59:59Z"
+        expected = (
+            "PublicationDate gt 2023-02-01T00:00:00Z and PublicationDate le 2023-02-01T23:59:59Z"
+        )
         self.assertEqual(expected, to_cdse(cql2_filter))
 
-    def test_publication_date_interval_before(self):
+    def test_publication_date_interval_before(self) -> None:
         cql2_filter = {
             "op": "t_before",
             "args": [
@@ -96,10 +102,12 @@ class TestPublicationDate(unittest.TestCase):
                 {"interval": ["2023-02-01T00:00:00Z", "2023-02-01T23:59:59Z"]},
             ],
         }
-        expected = "PublicationDate ge 2023-02-01T00:00:00Z and PublicationDate lt 2023-02-01T23:59:59Z"
+        expected = (
+            "PublicationDate ge 2023-02-01T00:00:00Z and PublicationDate lt 2023-02-01T23:59:59Z"
+        )
         self.assertEqual(expected, to_cdse(cql2_filter))
 
-    def test_publication_date_interval_begin(self):
+    def test_publication_date_interval_begin(self) -> None:
         cql2_filter = {
             "op": "t_begins",
             "args": [
@@ -107,10 +115,12 @@ class TestPublicationDate(unittest.TestCase):
                 {"interval": ["2023-02-01T00:00:00Z", "2023-02-01T23:59:59Z"]},
             ],
         }
-        expected = "PublicationDate ge 2023-02-01T00:00:00Z and PublicationDate le 2023-02-01T23:59:59Z"
+        expected = (
+            "PublicationDate ge 2023-02-01T00:00:00Z and PublicationDate le 2023-02-01T23:59:59Z"
+        )
         self.assertEqual(expected, to_cdse(cql2_filter))
 
-    def test_publication_date_interval_ends(self):
+    def test_publication_date_interval_ends(self) -> None:
         cql2_filter = {
             "op": "t_ends",
             "args": [
@@ -118,5 +128,7 @@ class TestPublicationDate(unittest.TestCase):
                 {"interval": ["2023-02-01T00:00:00Z", "2023-02-01T23:59:59Z"]},
             ],
         }
-        expected = "PublicationDate ge 2023-02-01T00:00:00Z and PublicationDate le 2023-02-01T23:59:59Z"
+        expected = (
+            "PublicationDate ge 2023-02-01T00:00:00Z and PublicationDate le 2023-02-01T23:59:59Z"
+        )
         self.assertEqual(expected, to_cdse(cql2_filter))

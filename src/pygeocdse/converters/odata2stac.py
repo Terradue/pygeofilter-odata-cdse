@@ -28,7 +28,7 @@ from pystac.extensions.sat import OrbitState, SatExtension
 from pystac.extensions.sentinel1 import Sentinel1Extension
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Iterator, Mapping, Sequence
 
 LEVEL_MAP = {
     "LEVEL1": "L1",
@@ -52,88 +52,84 @@ def _parse_rfc3339(dt: str) -> datetime:
 
 
 class Handler(Protocol):
-    def __call__(
-        self, product: Mapping[str, Any], value: Any, target_item: Item
-    ) -> None: ...
+    def __call__(self, product: Mapping[str, Any], value: Any, target_item: Item) -> None: ...
 
 
-def _set_date(target_property: str, value: Any, target_item: Item):
+def _set_date(target_property: str, value: Any, target_item: Item) -> None:
     target_item.properties[target_property] = (
         _parse_rfc3339(str(value)).isoformat().replace("+00:00", "Z")
     )
 
 
-def on_beginning_datetime(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_beginning_datetime(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     _set_date("start_datetime", value, target_item)
 
 
-def on_ending_datetime(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_ending_datetime(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     _set_date("end_datetime", value, target_item)
 
 
-def on_orbit_number(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_orbit_number(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     SatExtension.ensure_has_extension(target_item, add_if_missing=True)
     target_item.ext.sat.absolute_orbit = value
 
 
-def on_relative_orbit_number(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_relative_orbit_number(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     SatExtension.ensure_has_extension(target_item, add_if_missing=True)
     target_item.ext.sat.relative_orbit = value
 
 
-def on_orbit_direction(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_orbit_direction(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     SatExtension.ensure_has_extension(target_item, add_if_missing=True)
     target_item.ext.sat.orbit_state = OrbitState[str(value).upper()]
 
 
-def on_polarisation_channels(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_polarisation_channels(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     SarExtension.ensure_has_extension(target_item, add_if_missing=True)
-    target_item.ext.sar.polarizations = [
-        Polarization[name] for name in str(value).split("&")
-    ]
+    target_item.ext.sar.polarizations = [Polarization[name] for name in str(value).split("&")]
 
 
-def on_product_type(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_product_type(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     product_ext = ProductExtension.ext(target_item, add_if_missing=True)
     product_ext.product_type = value
 
 
-def on_timeliness(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_timeliness(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     product_ext = ProductExtension.ext(target_item, add_if_missing=True)
     product_ext.apply(timeliness_category=value, timeliness="N/A")
 
 
-def on_processing_center(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_processing_center(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.facility = value
 
 
-def on_processing_level(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_processing_level(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.level = LEVEL_MAP.get(value, value)
 
 
-def on_processing_date(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_processing_date(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.processing_datetime = _parse_rfc3339(str(value))
 
 
-def on_processor_name(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_processor_name(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.software = value
 
 
-def on_processor_version(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_processor_version(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     proc_ext = ProcessingExtension.ext(target_item, add_if_missing=True)
     proc_ext.version = value
 
 
-def on_operational_mode(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_operational_mode(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     SarExtension.ensure_has_extension(target_item, add_if_missing=True)
     target_item.ext.sar.instrument_mode = str(value)
 
 
-def on_swath_identifier(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_swath_identifier(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     # CDSE: "IW1 IW2 IW3"
     SarExtension.ensure_has_extension(target_item, add_if_missing=True)
 
@@ -143,30 +139,27 @@ def on_swath_identifier(product: Mapping[str, Any], value: Any, target_item: Ite
     )
 
 
-def on_platform_short_name(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_platform_short_name(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     # Example: SENTINEL-1 -> sentinel-1
     target_item.properties["constellation"] = str(value).lower()
-    target_item.properties["platform"] = (
-        str(value).lower()
-        + [
-            attribute.get("Value").lower()
-            for attribute in product.get("Attributes", {})
-            if attribute.get("Name") == "platformSerialIdentifier"
-        ][0]
+    target_item.properties["platform"] = str(value).lower() + next(
+        attribute.get("Value").lower()
+        for attribute in product.get("Attributes", {})
+        if attribute.get("Name") == "platformSerialIdentifier"
     )
 
 
-def on_instrument_short_name(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_instrument_short_name(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     # Example: SAR -> ["sar"]
     target_item.properties["instruments"] = [str(value).lower()]
 
 
-def on_cloud_cover(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_cloud_cover(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     EOExtension.ensure_has_extension(target_item, add_if_missing=True)
     target_item.ext.eo.cloud_cover = float(value)
 
 
-def on_slice_number(product: Mapping[str, Any], value: Any, target_item: Item):
+def on_slice_number(product: Mapping[str, Any], value: Any, target_item: Item) -> None:
     s1_extension = Sentinel1Extension.ext(target_item, add_if_missing=True)
     s1_extension.slice_number = value
 
@@ -203,9 +196,7 @@ def _apply_attributes(product: Mapping[str, Any], item: Item) -> None:
         if name in DISPATCH_REGISTRY:
             DISPATCH_REGISTRY[name](product, value, item)
         elif name != "platformSerialIdentifier":
-            logger.warning(
-                f"Attribute '{name}' not yet managed by the STAC spec or extensions."
-            )
+            logger.warning(f"Attribute '{name}' not yet managed by the STAC spec or extensions.")
 
 
 def _bbox_from_geojson_geometry(geom: dict[str, Any]) -> list[float]:
@@ -214,13 +205,17 @@ def _bbox_from_geojson_geometry(geom: dict[str, Any]) -> list[float]:
     Supports Polygon and MultiPolygon.
     """
     gtype = geom.get("type")
-    coords = geom.get("coordinates")
+    coords = geom["coordinates"]
 
-    def iter_points_polygon(poly_coords):
+    def iter_points_polygon(
+        poly_coords: Sequence[Sequence[Sequence[float]]],
+    ) -> Iterator[Sequence[float]]:
         for ring in poly_coords:
             yield from ring
 
-    def iter_points_multipolygon(mpoly_coords):
+    def iter_points_multipolygon(
+        mpoly_coords: Sequence[Sequence[Sequence[Sequence[float]]]],
+    ) -> Iterator[Sequence[float]]:
         for poly in mpoly_coords:
             yield from iter_points_polygon(poly)
 
@@ -236,9 +231,49 @@ def _bbox_from_geojson_geometry(geom: dict[str, Any]) -> list[float]:
     return [min(xs), min(ys), max(xs), max(ys)]
 
 
-def odata_products_to_stac_item_collection(
-    url: str, odata: Mapping[str, Any]
-) -> ItemCollection:
+def _add_assets(product: Mapping[str, Any], item: Item) -> None:
+    locations = product.get("Locations") or []
+    if locations:
+        for location in locations:
+            asset = Asset(
+                href=str(location.get("DownloadLink")),
+                # media_type=product.get("ContentType") or product.get("@odata.mediaContentType"),
+                roles=["data"],
+                title=str(location.get("FormatType")),
+                extra_fields={"file:size": location.get("ContentLength")},
+            )
+
+            checksums = location.get("Checksum") or []
+            for checksum in checksums:
+                asset.extra_fields[f"checksum:{checksum.get('Algorithm')}"] = checksum.get("Value")
+
+            item.add_asset(str(location.get("FormatType")), asset)
+    else:
+        # try guess
+        if "S3Path" in product:
+            asset = Asset(
+                href=str(product.get("S3Path")),
+                media_type=product.get("ContentType") or product.get("@odata.mediaContentType"),
+                roles=["data"],
+                title=product.get("Name"),
+                extra_fields={
+                    "file:size": product.get("ContentLength"),
+                    "checksum": product.get("Checksum"),
+                },
+            )
+            item.add_asset("data", asset)
+
+        # Add the zipped archive
+        zip_asset = Asset(
+            href=f"https://download.dataspace.copernicus.eu/odata/v1/Products({product.get('Id')})/$value",
+            media_type="application/zip",
+            roles=["data", "metadata", "archive"],
+            title="application/zip",
+        )
+        item.add_asset("Product", zip_asset)
+
+
+def odata_products_to_stac_item_collection(url: str, odata: Mapping[str, Any]) -> ItemCollection:
     """
     Convert an OData Products response to a PySTAC ItemCollection.
 
@@ -252,9 +287,7 @@ def odata_products_to_stac_item_collection(
     items: list[Item] = []
 
     for i, product in enumerate(products):
-        logger.debug(
-            "------------------------------------------------------------------------"
-        )
+        logger.debug("------------------------------------------------------------------------")
         logger.debug(f"Processing Product {i + 1} of {len(products)}")
 
         geom = product.get("GeoFootprint")
@@ -277,9 +310,7 @@ def odata_products_to_stac_item_collection(
         )
 
         if beginning is None:
-            raise ValueError(
-                f"Product {product.get('Id')} has no beginningDateTime attribute"
-            )
+            raise ValueError(f"Product {product.get('Id')} has no beginningDateTime attribute")
 
         properties: dict[str, Any] = {}
 
@@ -300,48 +331,7 @@ def odata_products_to_stac_item_collection(
             )
         )
 
-        locations = product.get("Locations") or []
-        if locations:
-            for location in locations:
-                asset = Asset(
-                    href=str(location.get("DownloadLink")),
-                    # media_type=product.get("ContentType") or product.get("@odata.mediaContentType"),
-                    roles=["data"],
-                    title=str(location.get("FormatType")),
-                    extra_fields={"file:size": location.get("ContentLength")},
-                )
-
-                checksums = location.get("Checksum") or []
-                for checksum in checksums:
-                    asset.extra_fields[f"checksum:{checksum.get('Algorithm')}"] = (
-                        checksum.get("Value")
-                    )
-
-                item.add_asset(str(location.get("FormatType")), asset)
-        else:
-            # try guess
-            if "S3Path" in product:
-                asset = Asset(
-                    href=str(product.get("S3Path")),
-                    media_type=product.get("ContentType")
-                    or product.get("@odata.mediaContentType"),
-                    roles=["data"],
-                    title=product.get("Name"),
-                    extra_fields={
-                        "file:size": product.get("ContentLength"),
-                        "checksum": product.get("Checksum"),
-                    },
-                )
-                item.add_asset("data", asset)
-
-            # Add the zipped archive
-            zip_asset = Asset(
-                href=f"https://download.dataspace.copernicus.eu/odata/v1/Products({product.get('Id')})/$value",
-                media_type="application/zip",
-                roles=["data", "metadata", "archive"],
-                title="application/zip",
-            )
-            item.add_asset("Product", zip_asset)
+        _add_assets(product, item)
 
         _apply_attributes(product, item)
 
@@ -352,6 +342,6 @@ def odata_products_to_stac_item_collection(
     return ItemCollection(items, clone_items=True)
 
 
-def to_stac_item_collection(url: str, odata: Mapping[str, Any], output_stream: TextIO):
+def to_stac_item_collection(url: str, odata: Mapping[str, Any], output_stream: TextIO) -> None:
     item_collection: ItemCollection = odata_products_to_stac_item_collection(url, odata)
     json.dump(item_collection.to_dict(), output_stream, indent=2)

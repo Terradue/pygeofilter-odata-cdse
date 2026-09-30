@@ -21,7 +21,9 @@ from typing import TYPE_CHECKING, Any, TextIO
 import geojson
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping
+    from collections.abc import Callable, Iterator, Mapping, Sequence
+
+    from geojson.geometry import Geometry
 
 
 def _parse_rfc3339(dt: str | None) -> str | None:
@@ -36,13 +38,17 @@ def _parse_rfc3339(dt: str | None) -> str | None:
 def _bbox_from_geojson_geometry(geom: dict[str, Any]) -> list[float]:
     """Compute [minx, miny, maxx, maxy] from Polygon/MultiPolygon GeoJSON geometry."""
     gtype = geom.get("type")
-    coords = geom.get("coordinates")
+    coords = geom["coordinates"]
 
-    def iter_points_polygon(poly_coords):
+    def iter_points_polygon(
+        poly_coords: Sequence[Sequence[Sequence[float]]],
+    ) -> Iterator[Sequence[float]]:
         for ring in poly_coords:
             yield from ring
 
-    def iter_points_multipolygon(mpoly_coords):
+    def iter_points_multipolygon(
+        mpoly_coords: Sequence[Sequence[Sequence[Sequence[float]]]],
+    ) -> Iterator[Sequence[float]]:
         for poly in mpoly_coords:
             yield from iter_points_polygon(poly)
 
@@ -76,6 +82,14 @@ class FeatureBuildOptions:
 DEFAULT_FEATURE_BUILD_OPTIONS = FeatureBuildOptions()
 
 
+def _filter_properties(
+    properties: dict[str, Any], property_filter: Callable[[str, Any], bool] | None
+) -> dict[str, Any]:
+    if property_filter is None:
+        return properties
+    return {key: value for key, value in properties.items() if property_filter(key, value)}
+
+
 def odata_products_to_feature_collection_geojson(
     odata: Mapping[str, Any],
     opts: FeatureBuildOptions = DEFAULT_FEATURE_BUILD_OPTIONS,
@@ -90,7 +104,7 @@ def odata_products_to_feature_collection_geojson(
       - bbox: optional per Feature bbox (and optional top-level bbox)
     """
     products: list[dict[str, Any]] = list(odata.get("value") or [])
-    features: list[geojson.Feature] = []
+    features: list[geojson.Feature | Geometry] = []
 
     # Optional top-level bbox
     minx = miny = float("inf")
@@ -127,8 +141,7 @@ def odata_products_to_feature_collection_geojson(
         }
         props = {k: v for k, v in props.items() if v is not None}
 
-        if opts.property_filter is not None:
-            props = {k: v for k, v in props.items() if opts.property_filter(k, v)}
+        props = _filter_properties(props, opts.property_filter)
 
         geom = _to_geojson_instance(geom_dict)
 
@@ -160,6 +173,6 @@ def to_feature_collection_geojson(
     odata: Mapping[str, Any],
     output_stream: TextIO,
     opts: FeatureBuildOptions = DEFAULT_FEATURE_BUILD_OPTIONS,
-):
+) -> None:
     feature_collection = odata_products_to_feature_collection_geojson(odata, opts)
     output_stream.write(geojson.dumps(feature_collection, indent=2))

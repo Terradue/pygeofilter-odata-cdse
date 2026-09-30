@@ -1,6 +1,8 @@
 # Supported attributes
 
-As stated, this library was initially developed to support CDSE use cases only, so please make sure the parameters users can query.
+These tables describe the attribute dictionaries shipped with the library. Type lookup checks Sentinel-1, Sentinel-2, Sentinel-3, then Sentinel-5P and returns the first matching type, regardless of the selected collection. Unknown attributes raise `ValueError`.
+
+`Collection/Name`, `PublicationDate`, and `ModificationDate` are additionally recognized by the registry. Use temporal predicates for product date fields; see the [operator reference](reference/operators.md).
 
 ## Sentinel-1
 
@@ -40,6 +42,8 @@ As stated, this library was initially developed to support CDSE use cases only, 
 | `completionTimeFromAscendingNode` | `Double`         |
 
 ## Sentinel-1-RTC
+
+This dictionary exists in the source but is not included in `ALL_ATTRIBUTES`. RTC-only names, such as `authority` and `spatialResolution`, are not recognized unless present in another registered dictionary.
 
 | Name                       | Type      |
 |----------------------------|-----------|

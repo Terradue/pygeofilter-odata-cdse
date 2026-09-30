@@ -19,14 +19,14 @@ from pygeocdse.evaluator import to_cdse
 
 # see https://documentation.dataspace.copernicus.eu/APIs/OData.html#query-by-sensing-date
 class TestSensingDate(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         pass
 
     """
     timestamp
     """
 
-    def test_content_date_start(self):
+    def test_content_date_start(self) -> None:
         # To search for products acquired between two dates
         cql2_filter = {
             "op": "and",
@@ -50,7 +50,7 @@ class TestSensingDate(unittest.TestCase):
         expected = "ContentDate/Start gt 2023-02-01T00:00:00Z and ContentDate/Start lt 2023-02-28T23:59:59Z"
         self.assertEqual(expected, to_cdse(cql2_filter))
 
-    def test_content_date_start_inclusive(self):
+    def test_content_date_start_inclusive(self) -> None:
         # Usually, there are two parameters describing the ContentDate (Acquisition Dates) for a product - Start and End.
         # Depending on what the user is looking for, these parameters can be mixed
         cql2_filter = {
@@ -72,14 +72,16 @@ class TestSensingDate(unittest.TestCase):
                 },
             ],
         }
-        expected = "ContentDate/Start ge 2023-02-01T00:00:00Z and ContentDate/End le 2023-02-28T23:59:59Z"
+        expected = (
+            "ContentDate/Start ge 2023-02-01T00:00:00Z and ContentDate/End le 2023-02-28T23:59:59Z"
+        )
         self.assertEqual(expected, to_cdse(cql2_filter))
 
     """
     interval
     """
 
-    def test_content_date_start_inclusive_intervals(self):
+    def test_content_date_start_inclusive_intervals(self) -> None:
         # Usually, there are two parameters describing the ContentDate (Acquisition Dates) for a product - Start and End.
         # Depending on what the user is looking for, these parameters can be mixed
         cql2_filter = {
@@ -108,7 +110,7 @@ class TestSensingDate(unittest.TestCase):
     interval with deltas
     """
 
-    def test_content_date_start_inclusive_invalid_delta_interval(self):
+    def test_content_date_start_inclusive_invalid_delta_interval(self) -> None:
         cql2_filter = {
             "op": "t_after",
             "args": [
@@ -125,7 +127,7 @@ class TestSensingDate(unittest.TestCase):
         with self.assertRaises(ValueError):
             to_cdse(cql2_filter)
 
-    def test_content_date_start_inclusive_delta_interval(self):
+    def test_content_date_start_inclusive_delta_interval(self) -> None:
         cql2_filter = {
             "op": "t_after",
             "args": [
@@ -136,7 +138,7 @@ class TestSensingDate(unittest.TestCase):
         expected = "ContentDate/Start gt 2023-02-28T00:00:00Z and ContentDate/Start le 2023-02-28T00:00:04Z"
         self.assertEqual(expected, to_cdse(cql2_filter))
 
-    def test_content_date_start_inclusive_delta2_interval(self):
+    def test_content_date_start_inclusive_delta2_interval(self) -> None:
         cql2_filter = {
             "op": "t_after",
             "args": [

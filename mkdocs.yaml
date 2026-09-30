@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 site_name: pygeofilter CDSE OData support for CQL2
 site_url: https://terradue.github.io/pygeofilter-odata-cdse/
 site_author: Fabrice Brito, Simone Tripodi
@@ -23,26 +20,15 @@ repo_name: Terradue/pygeofilter-odata-cdse
 
 theme:
     logo: imgs/icon-eoap.png
-    name: material
+    name: readthedocs
 
-    palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      toggle:
-        icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to light mode
 
 plugins:
   - search
   - mermaid2:
       version: 11.4.1
   - mkdocs-jupyter:
-      execute: true
+      execute: false
       show_input: True
       no_input: False
 
@@ -69,21 +55,27 @@ markdown_extensions:
   - pymdownx.highlight:
       line_spans: __span
 
-extra_css:
-  - styles/css/app.css
-  
-extra_javascript:
-  - javascripts/config.js
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-
 nav:
-  - Introduction: index.ipynb
-  - Supported attributes: attributes.md
-  - Supported operators:
-    - Logical and Comparison operators: logical_comparison_op.ipynb
-    - Geographical operators: geographical_op.ipynb
-    - Temporal operators: temporal_op.ipynb
-  - cli.md
-  - OData-STAC crosswalk: odata-stac-crosswalk.md
+  - Home: index.md
+  - Tutorials:
+    - Translate your first filter: tutorials/first-filter.md
+  - How-to guides:
+    - Search the catalogue: how-to/search.md
+    - Convert responses: how-to/convert.md
+    - Develop and preview documentation: how-to/develop.md
+  - Reference:
+    - Python API: reference/api.md
+    - Operators: reference/operators.md
+    - Attributes: attributes.md
+    - CLI: cli.md
+    - OData-STAC crosswalk: odata-stac-crosswalk.md
+    - Container builds: reference/containers.md
+    - Example notebooks:
+      - Catalogue search: catalogue-search.ipynb
+      - Logical and comparison operators: logical_comparison_op.ipynb
+      - Spatial operators: geographical_op.ipynb
+      - Temporal operators: temporal_op.ipynb
+  - Explanation:
+    - Translation and conversion: explanation/architecture.md
 
-copyright: <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue"" alt="Apache License, Version 2.0" /></a>
+copyright: <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue" alt="Apache License, Version 2.0" /></a>
