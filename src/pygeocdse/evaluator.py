@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Translate CQL2 filters into CDSE OData expressions and query the catalogue."""
+
 from __future__ import annotations
 
 import json
 import re
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from functools import wraps
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
@@ -66,11 +68,22 @@ ARITHMETIC_OP_MAP = {
 
 
 def date_format(value: str | date | timedelta | None) -> str:
+    """Serialize a concrete date as UTC, retaining microsecond precision.
+
+    Dates and naive datetimes are interpreted as UTC.
+
+    Raises:
+        ValueError: If the value is not a concrete date or cannot be parsed.
+    """
     if isinstance(value, str):
         return date_format(parse_datetime(value))
     if not isinstance(value, date):
         raise ValueError("A concrete date is required")
-    return value.strftime("%Y-%m-%dT%H:%M:%SZ")
+    if not isinstance(value, datetime):
+        value = datetime.combine(value, time(), tzinfo=timezone.utc)
+    elif value.utcoffset() is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 class CDSEEvaluator(Evaluator):
@@ -80,7 +93,8 @@ class CDSEEvaluator(Evaluator):
 
     @handle(ast.Not)
     def not_(self, node: ast.Not, sub: str) -> str:
-        return f"NOT {sub}"
+        """Negate the entire operand, preserving its logical grouping."""
+        return f"not ({sub})"
 
     @handle(ast.And)
     def and_combination(self, node: ast.And, lhs: str, rhs: str) -> str:
@@ -92,13 +106,13 @@ class CDSEEvaluator(Evaluator):
 
     @handle(ast.Comparison, subclasses=True)
     def comparison(self, node: ast.Comparison, lhs: str, rhs: str) -> str:
+        """Compare a collection name or a typed product attribute."""
         if cast("ast.Attribute", node.lhs).name == "Collection/Name":
             return f"{cast('ast.Attribute', node.lhs).name} {COMPARISON_OP_MAP.get(node.op)} {rhs}"
 
-        if "Date" in lhs:
-            rhs = str(node.rhs)
-
         attr_type = get_attribute_type(cast("ast.Attribute", node.lhs).name)
+        if attr_type == "DateTimeOffset" and isinstance(node.rhs, (str, date)):
+            rhs = date_format(node.rhs)
         return f"Attributes/OData.CSC.{attr_type}Attribute/any(att:att/Name eq {lhs} and att/OData.CSC.{attr_type}Attribute/Value {COMPARISON_OP_MAP[node.op]} {rhs})"
 
     @handle(ast.Between)
@@ -229,8 +243,11 @@ class CDSEEvaluator(Evaluator):
 
     @handle(*values.LITERALS)
     def literal(self, node: object) -> str:
+        """Serialize strings, booleans, and dates using OData literal syntax."""
         if isinstance(node, str):
-            return f"'{node}'"
+            return "'" + node.replace("'", "''") + "'"
+        if isinstance(node, bool):
+            return "true" if node else "false"
         if isinstance(node, date):
             return date_format(node)
         # TODO:
