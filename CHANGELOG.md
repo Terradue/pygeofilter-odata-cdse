@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-06
+
 ### Added
 
 - Added a quality pipeline covering mypy, Ruff, Bandit, and pytest with coverage
@@ -20,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reorganized the Hatch test and development environments.
 - Updated source and test code to satisfy the expanded type, lint, and security
   checks.
+- `allow-direct-references` no longer needed, `@t2_extension` T2 branched fork of `pystac` replaced with:
+  - `pystac-ext-processing`
+  - `pystac-ext-product`;
+  - `pystac-ext-sentinel-1`.
 
 ## [0.7.0] - 2026-05-20
 
@@ -122,7 +128,8 @@ First tagged release.
 
 - Relicensed the project under the Apache License 2.0.
 
-[Unreleased]: https://github.com/Terradue/pygeofilter-odata-cdse/compare/v0.7.0...develop
+[Unreleased]: https://github.com/Terradue/pygeofilter-odata-cdse/compare/v0.8.0...develop
+[0.8.0]: https://github.com/Terradue/pygeofilter-odata-cdse/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Terradue/pygeofilter-odata-cdse/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Terradue/pygeofilter-odata-cdse/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Terradue/pygeofilter-odata-cdse/compare/v0.4.0...v0.5.0
