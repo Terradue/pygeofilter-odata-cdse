@@ -51,17 +51,16 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "geojson==3.3.0",
-  "pystac @ git+https://github.com/Terradue/pystac.git@t2_extensions",
   "click==8.5.0",
-  "pygeofilter==0.4.0",
-  "shapely==2.1.2",
+  "geojson==3.3.0",
+  "httpx==0.28.1",
   "loguru==0.7.3",
-  "httpx==0.28.1"
+  "pygeofilter==0.4.0",
+  "pystac-ext-processing==1.2.0",
+  "pystac-ext-product==1.1.0",
+  "pystac-ext-sentinel-1==0.2.0",
+  "shapely==2.1.2"
 ]
-
-[tool.hatch.metadata]
-allow-direct-references = true
 
 # ---------------------------------------------------------------------------
 # Project Refs
