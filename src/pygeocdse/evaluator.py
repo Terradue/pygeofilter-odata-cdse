@@ -22,6 +22,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from functools import wraps
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar, cast
+from urllib.parse import quote
 
 import shapely
 from httpx import Client, Headers, Request, RequestNotRead, Response
@@ -342,9 +343,13 @@ def http_invoke(
     limit: int = 20,
     max_items: int = 200,
     timeout: int = 30,
+    order_by: str | None = None,
 ) -> Mapping[str, Any]:
+    """Issue one OData GET, optionally ordering results by an OData field."""
     current_filter: str = to_cdse(cql2_filter)
     url: str = f"{base_url}?$filter={current_filter}&$top={max_items}&$expand=Assets&$expand=Attributes&$expand=Locations"
+    if order_by:
+        url += f"&$orderby={quote(order_by, safe='/')}"
 
     with Client() as http_client:
         http_client.build_request = _log_request(http_client.build_request)  # type: ignore

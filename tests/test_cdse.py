@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import unittest
+from unittest.mock import MagicMock, patch
 
-from pygeocdse.evaluator import to_cdse
+from pygeocdse.evaluator import http_invoke, to_cdse
 
 
 class TestCDSEEvaluator(unittest.TestCase):
@@ -117,3 +118,35 @@ class TestCDSEEvaluator(unittest.TestCase):
         current = to_cdse(cql2_filter)
 
         self.assertEqual(expected, current)
+
+
+class TestHttpInvoke(unittest.TestCase):
+    def test_order_by_is_encoded_and_optional(self) -> None:
+        with patch("pygeocdse.evaluator.Client") as client_class:
+            http_client = client_class.return_value.__enter__.return_value
+            response = MagicMock()
+            response.json.return_value = {"value": []}
+            http_client.get.return_value = response
+
+            result = http_invoke(
+                "https://example.test/Products",
+                {"op": "=", "args": [{"property": "Collection/Name"}, "SENTINEL-1"]},
+                order_by="ContentDate/Start asc",
+            )
+
+        self.assertEqual({"value": []}, result)
+        self.assertIn("$orderby=ContentDate/Start%20asc", http_client.get.call_args.kwargs["url"])
+
+    def test_order_by_is_omitted_by_default(self) -> None:
+        with patch("pygeocdse.evaluator.Client") as client_class:
+            http_client = client_class.return_value.__enter__.return_value
+            response = MagicMock()
+            response.json.return_value = {"value": []}
+            http_client.get.return_value = response
+
+            http_invoke(
+                "https://example.test/Products",
+                {"op": "=", "args": [{"property": "Collection/Name"}, "SENTINEL-1"]},
+            )
+
+        self.assertNotIn("$orderby", http_client.get.call_args.kwargs["url"])

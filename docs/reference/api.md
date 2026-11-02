@@ -9,9 +9,9 @@ The import namespace is `pygeocdse`. CQL2 JSON inputs may be Python dictionaries
 | `to_cdse(cql2_filter)` | Returns an OData filter string using identity field mapping. Parses CQL2 JSON; does not send a request. |
 | `to_cdse_where(root, field_mapping, function_map=None)` | Evaluates a pygeofilter AST and returns a string. `field_mapping` maps attribute names; `function_map` maps function names and defaults to an empty mapping. |
 | `CDSEEvaluator(attribute_map, function_map)` | AST evaluator used by both translation functions. |
-| `http_invoke(base_url, cql2_filter, limit=20, max_items=200, timeout=30)` | Returns the decoded OData response mapping from one GET request. |
+| `http_invoke(base_url, cql2_filter, limit=20, max_items=200, timeout=30, order_by=None)` | Returns the decoded OData response mapping from one GET request. |
 
-`http_invoke` appends `$filter`, `$top=max_items`, and expansions for `Assets`, `Attributes`, and `Locations`. It sends `Prefer: odata.maxpagesize=<limit>` and passes `timeout` in seconds to HTTPX. Supply a Products endpoint without an existing query string. It calls `raise_for_status()` and does not follow pagination links. HTTPX connection, timeout, status, and JSON decoding errors can propagate.
+`http_invoke` appends `$filter`, `$top=max_items`, and expansions for `Assets`, `Attributes`, and `Locations`. When supplied, `order_by` is URL-encoded and appended as `$orderby`. It sends `Prefer: odata.maxpagesize=<limit>` and passes `timeout` in seconds to HTTPX. Supply a Products endpoint without an existing query string. It calls `raise_for_status()` and does not follow pagination links. HTTPX connection, timeout, status, and JSON decoding errors can propagate.
 
 Unknown query attributes raise `ValueError`. Missing field/function mappings can raise `KeyError`. A custom field mapping does not replace the built-in type registry: comparison type lookup uses the original attribute name. See [operators](operators.md) and [attributes](../attributes.md).
 
