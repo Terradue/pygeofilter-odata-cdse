@@ -54,7 +54,7 @@ dependencies = [
   "click==8.5.0",
   "geojson==3.3.0",
   "httpx==0.28.1",
-  "loguru==0.7.3",
+  "loguru==0.8.0",
   "pygeofilter==0.4.0",
   "pystac-ext-processing==1.2.0",
   "pystac-ext-product==1.1.0",
